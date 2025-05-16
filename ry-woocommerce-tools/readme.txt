@@ -2,10 +2,10 @@
 Contributors: fantasyworld
 Donate link: https://www.paypal.me/RicherYang
 Tags: woocommerce, payment, gateway, shipping
-Requires at least: 6.5
+Requires at least: 6.6
 Requires PHP: 8.0
-Tested up to: 6.7
-Stable tag: 3.5.5
+Tested up to: 6.8
+Stable tag: 3.5.6
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -25,7 +25,7 @@ You can contribute to this plugin to [GitHub repository](https://github.com/Rich
 = Minimum Requirements =
 
 * PHP 8.0+
-* WordPress 6.5+
+* WordPress 6.6+
 * WooCommerce 8.0+
 
 == Frequently Asked Questions ==
@@ -39,6 +39,9 @@ Please visit the [plugin forum page](https://ry-plugin.com/ry-woocommerce-tools/
 3. SmilePay gateway global settings.
 
 == Changelog ==
+
+= 3.5.6 - 2025-05-15 =
+* 調整 - 配合 Plugin check 檢查結果調整與修正。
 
 = 3.5.5 - 2025-03-31 =
 * 調整 - 調整綠界資訊內容。

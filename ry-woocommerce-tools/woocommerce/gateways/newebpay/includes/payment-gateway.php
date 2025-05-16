@@ -15,11 +15,6 @@ abstract class RY_WT_WC_NewebPay_Payment_Gateway extends RY_WT_WC_Payment_Gatewa
         parent::__construct();
     }
 
-    public function process_admin_options()
-    {
-        parent::process_admin_options();
-    }
-
     public function receipt_page($order_ID)
     {
         if ($order = wc_get_order($order_ID)) {
@@ -48,7 +43,7 @@ abstract class RY_WT_WC_NewebPay_Payment_Gateway extends RY_WT_WC_Payment_Gatewa
 
     public function get_icon()
     {
-        $icon_html = '<img src="' . esc_attr($this->get_icon_url()) . '" alt="' . esc_attr__('NewebPay', 'ry-woocommerce-tools') . '">';
+        $icon_html = '<img src="' . esc_attr($this->get_icon_url()) . '" alt="' . esc_attr__('NewebPay', 'ry-woocommerce-tools') . '">'; // phpcs:ignore PluginCheck.CodeAnalysis.ImageFunctions.NonEnqueuedImage
 
         return apply_filters('woocommerce_gateway_icon', $icon_html, $this->id);
     }

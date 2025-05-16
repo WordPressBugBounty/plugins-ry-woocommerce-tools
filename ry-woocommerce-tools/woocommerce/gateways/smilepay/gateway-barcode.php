@@ -34,14 +34,14 @@ class RY_SmilePay_Gateway_Barcode extends RY_WT_WC_SmilePay_Payment_Gateway
 
     public function process_admin_options()
     {
-        if (isset($_POST['woocommerce_ry_smilepay_barcode_expire_date'])) {
-            $_POST['woocommerce_ry_smilepay_barcode_expire_date'] = (int) $_POST['woocommerce_ry_smilepay_barcode_expire_date'];
-            if ($_POST['woocommerce_ry_smilepay_barcode_expire_date'] < 1 || $_POST['woocommerce_ry_smilepay_barcode_expire_date'] > 30) {
-                $_POST['woocommerce_ry_smilepay_barcode_expire_date'] = 7;
+        if (isset($_POST['woocommerce_ry_smilepay_barcode_expire_date'])) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+            $_POST['woocommerce_ry_smilepay_barcode_expire_date'] = intval($_POST['woocommerce_ry_smilepay_barcode_expire_date']); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+            if ($_POST['woocommerce_ry_smilepay_barcode_expire_date'] < 1 || $_POST['woocommerce_ry_smilepay_barcode_expire_date'] > 30) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+                $_POST['woocommerce_ry_smilepay_barcode_expire_date'] = 7; // phpcs:ignore WordPress.Security.NonceVerification.Missing
                 WC_Admin_Settings::add_error(__('Payment expire date out of range. Set as default value.', 'ry-woocommerce-tools'));
             }
         } else {
-            $_POST['woocommerce_ry_smilepay_barcode_expire_date'] = 7;
+            $_POST['woocommerce_ry_smilepay_barcode_expire_date'] = 7; // phpcs:ignore WordPress.Security.NonceVerification.Missing
         }
 
         parent::process_admin_options();

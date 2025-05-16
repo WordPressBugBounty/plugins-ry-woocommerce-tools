@@ -46,8 +46,8 @@ if ('VACC' !== $order->get_meta('_newebpay_payment_type')) {
                 <td>
                     <?php esc_html_e('ATM Bank account', 'ry-woocommerce-tools'); ?>
                 </td>
-                <td>
-                    <?php echo wordwrap(esc_html($order->get_meta('_newebpay_atm_vAccount')), 4, '<span> </span>', true); ?>
+                <td class="ry-atm-account">
+                    <?php echo wp_kses('<span>' . wordwrap($order->get_meta('_newebpay_atm_vAccount'), 4, '</span><span>', true) . '</span>', ['span' => []]); ?>
                 </td>
             </tr>
             <tr>

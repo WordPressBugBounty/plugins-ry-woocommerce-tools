@@ -9,11 +9,11 @@ return [
         'type' => 'title',
     ],
     [
-        'title' => __('Debug log', 'woocommerce'),
+        'title' => __('Debug log', 'ry-woocommerce-tools'),
         'id' => RY_WT::OPTION_PREFIX . 'ecpay_shipping_log',
         'type' => 'checkbox',
         'default' => 'no',
-        'desc' => __('Enable logging', 'woocommerce') . '<br>'
+        'desc' => __('Enable logging', 'ry-woocommerce-tools') . '<br>'
             . sprintf(
                 /* translators: %s: Path of log file */
                 __('Log API / IPN information, inside %s', 'ry-woocommerce-tools'),
@@ -182,19 +182,19 @@ return [
             . '<p class="description">' . __('Note: Recommend using this for development purposes only.', 'ry-woocommerce-tools') . '<p>',
     ],
     [
-        'title' => __('MerchantID', 'ry-woocommerce-tools'),
+        'title' => _x('MerchantID', 'ECPay', 'ry-woocommerce-tools'),
         'id' => RY_WT::OPTION_PREFIX . 'ecpay_shipping_MerchantID',
         'type' => 'text',
         'default' => '',
     ],
     [
-        'title' => __('HashKey', 'ry-woocommerce-tools'),
+        'title' => _x('HashKey', 'ECPay', 'ry-woocommerce-tools'),
         'id' => RY_WT::OPTION_PREFIX . 'ecpay_shipping_HashKey',
         'type' => 'text',
         'default' => '',
     ],
     [
-        'title' => __('HashIV', 'ry-woocommerce-tools'),
+        'title' => _x('HashIV', 'ECPay', 'ry-woocommerce-tools'),
         'id' => RY_WT::OPTION_PREFIX . 'ecpay_shipping_HashIV',
         'type' => 'text',
         'default' => '',

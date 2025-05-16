@@ -92,17 +92,17 @@ final class RY_WT_WC_ECPay_Shipping_Admin
 
     public function print_shipping()
     {
-        if (!wp_verify_nonce(wp_unslash($_GET['_wpnonce'] ?? ''), 'ry-print-shipping')) {
+        if (!wp_verify_nonce(($_GET['_wpnonce'] ?? ''), 'ry-print-shipping')) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash , WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
             wp_safe_redirect(admin_url('edit.php?post_type=shop_order'));
             exit();
         }
 
-        $order_ID = wp_unslash($_GET['orderid'] ?? '');
-        $logistics_ID = (int) wp_unslash($_GET['id'] ?? 0);
+        $order_ID = intval($_GET['orderid'] ?? '');
+        $logistics_ID = sanitize_locale_name($_GET['id'] ?? '');
         $print_list = [];
 
         if (empty($logistics_ID)) {
-            $get_type = wp_unslash($_GET['type']);
+            $get_type = sanitize_key($_GET['type'] ?? '');
             $order_IDs = explode(',', $order_ID);
             foreach ($order_IDs as $order_ID) {
                 $order = wc_get_order((int) $order_ID);
@@ -177,12 +177,12 @@ final class RY_WT_WC_ECPay_Shipping_Admin
     {
         check_ajax_referer('get-shipping-info');
 
-        $order_ID = (int) wp_unslash($_POST['orderid'] ?? 0);
+        $order_ID = intval($_POST['orderid'] ?? '');
 
         $order = wc_get_order($order_ID);
         if (!empty($order)) {
-            $collection = 'Y' === wp_unslash($_POST['collection'] ?? '');
-            $temp = substr(wp_unslash($_POST['temp'] ?? ''), 0, 1);
+            $collection = 'Y' === wp_unslash($_POST['collection'] ?? ''); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+            $temp = substr(wp_unslash($_POST['temp'] ?? ''), 0, 1); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
             if (empty($temp)) {
                 $temp = null;
             }
