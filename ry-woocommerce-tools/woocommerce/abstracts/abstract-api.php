@@ -47,7 +47,7 @@ abstract class RY_WT_Api
 
     protected function submit_sctipt($action_script)
     {
-        $blockUI = '$.blockUI({
+        $blockUI = 'jQuery.blockUI({
             message: "' . __('Please wait.<br>Getting checkout info.', 'ry-woocommerce-tools') . '",
             baseZ: 99999,
             overlayCSS: {
@@ -63,7 +63,9 @@ abstract class RY_WT_Api
             }
         });';
 
-        wc_enqueue_js($blockUI . ' setTimeout(function() { ' . $action_script . ' }, 150);');
+        wp_register_script('ry-payment', '', ['wc-jquery-blockui'], RY_WT_VERSION, true);
+        wp_enqueue_script('ry-payment');
+        wp_add_inline_script('ry-payment', $blockUI . ' setTimeout(function() { ' . $action_script . ' }, 150);');
     }
 
     public function set_do_die()
