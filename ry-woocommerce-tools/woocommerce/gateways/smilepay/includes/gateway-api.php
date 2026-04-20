@@ -36,7 +36,7 @@ class RY_WT_WC_SmilePay_Gateway_Api extends RY_WT_SmilePay_Api
             }
         }
 
-        $this->submit_sctipt('jQuery.ajax({
+        $this->submit_sctipt('$.ajax({
             type: "GET",
             url: wc_checkout_params.ajax_url,
             data: {
