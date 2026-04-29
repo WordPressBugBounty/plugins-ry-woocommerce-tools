@@ -4,14 +4,14 @@ class RY_WT_WC_ECPay_Shipping_Api extends RY_WT_ECPay_Api
 {
     protected static $_instance = null;
 
-    protected $api_test_url = [
+    protected array $api_test_url = [
         'map' => 'https://logistics-stage.ecpay.com.tw/Express/map',
         'create' => 'https://logistics-stage.ecpay.com.tw/Express/Create',
         'print' => 'https://logistics-stage.ecpay.com.tw/Express/v2/PrintTradeDocument',
         'query' => 'https://logistics-stage.ecpay.com.tw/Helper/QueryLogisticsTradeInfo/V5',
     ];
 
-    protected $api_url = [
+    protected array $api_url = [
         'map' => 'https://logistics.ecpay.com.tw/Express/map',
         'create' => 'https://logistics.ecpay.com.tw/Express/Create',
         'print' => 'https://logistics.ecpay.com.tw/Express/v2/PrintTradeDocument',
@@ -46,7 +46,7 @@ class RY_WT_WC_ECPay_Shipping_Api extends RY_WT_ECPay_Api
         $item_name = $this->get_item_name(RY_WT::get_option('shipping_item_name', ''), $order);
         $item_name = mb_substr($item_name, 0, 20);
         $declare_over_type = RY_WT::get_option('ecpay_shipping_declare_over', 'keep');
-        $default_weight = RY_WT::get_option('ecpay_shipping_product_weight', 0);
+        $default_weight = RY_WT::get_option('shipping_product_weight', 0);
 
         foreach ($order->get_items('shipping') as $shipping_item) {
             $shipping_method = RY_WT_WC_ECPay_Shipping::instance()->get_order_support_shipping($shipping_item);
