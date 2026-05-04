@@ -1,5 +1,7 @@
 <?php
 
+defined('ABSPATH') or exit;
+
 class RY_WT_Shipping_Info_List_Table extends WP_List_Table
 {
     public $order;

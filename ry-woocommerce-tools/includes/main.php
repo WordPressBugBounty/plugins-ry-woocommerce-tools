@@ -1,14 +1,16 @@
 <?php
 
+defined('ABSPATH') or exit;
+
 final class RY_WT
 {
     public const OPTION_PREFIX = 'RY_WT_';
 
     public const MIN_WC_VERSION = '9.0.0';
 
-    public const MIN_PRO_TOOLS_VERSION = '3.7.0';
+    public const MIN_PRO_TOOLS_VERSION = '3.7.2';
 
-    protected static $_instance = null;
+    protected static ?self $_instance = null;
 
     public static function instance(): RY_WT
     {
