@@ -21,11 +21,10 @@ final class RY_WT_WC_ECPay_Shipping_Admin
 
         add_filter('woocommerce_get_sections_rytools', [$this, 'add_sections']);
         add_filter('woocommerce_get_settings_rytools', [$this, 'add_setting'], 10, 2);
-        add_filter('woocommerce_admin_settings_sanitize_option_' . RY_WT::OPTION_PREFIX . 'shipping_product_weight', [$this, 'only_number']);
         add_action('woocommerce_update_options_rytools_ecpay_shipping', [$this, 'check_option']);
 
         add_action('admin_post_ry-print-ecpay-shipping', [$this, 'print_shipping']);
-        add_action('wp_ajax_RY_ecpay_shipping_info', [$this, 'get_shipping_info']);
+        add_action('wp_ajax_RY_ecpay_get_shipping_note', [$this, 'get_shipping_note']);
     }
 
     public function add_meta_box($post_type, $data_object)
@@ -46,13 +45,13 @@ final class RY_WT_WC_ECPay_Shipping_Admin
         if ($current_section == 'ecpay_shipping') {
             $settings = include RY_WT_PLUGIN_DIR . 'woocommerce/shipping/ecpay/includes/settings/admin-settings.php';
 
-            if (RY_WT_WC_ECPay_Shipping::instance()->is_testmode()) {
-                list($MerchantID, $HashKey, $HashIV, $cvs_type) = RY_WT_WC_ECPay_Shipping::instance()->get_api_info();
-                $setting_idx = array_search(RY_WT::OPTION_PREFIX . 'ecpay_shipping_MerchantID', array_column($settings, 'id'));
+            $api_info = RY_WT_WC_ECPay_Shipping::instance()->get_api_info();
+            if ($api_info['testmode']) {
+                $setting_idx = array_search(RY_WT::OPTION_PREFIX . 'ecpay_shipping_apiinfo[MerchantID]', array_column($settings, 'id'));
                 $settings[$setting_idx]['desc'] = '<p class="description">' . sprintf(
                     /* translators: %s: MerchantID */
                     __('Used MerchantID "%s"', 'ry-woocommerce-tools'),
-                    $MerchantID,
+                    $api_info['MerchantID'],
                 ) . '</p>';
             }
         }
@@ -60,48 +59,44 @@ final class RY_WT_WC_ECPay_Shipping_Admin
         return $settings;
     }
 
-    public function only_number($value): ?float
-    {
-        if (null !== $value) {
-            $value = (float) $value;
-        }
-
-        return $value;
-    }
-
     public function check_option()
     {
-        $name = RY_WT::get_option('ecpay_shipping_sender_name');
-        if (mb_strwidth($name) < 1 || mb_strwidth($name) > 10) {
-            WC_Admin_Settings::add_error(__('Verification failed!', 'ry-woocommerce-tools') . ' ' . __('Name length between 1 to 10 letter (5 if chinese)', 'ry-woocommerce-tools'));
-            RY_WT::update_option('ecpay_shipping_sender_name', '');
-        }
-        if (!empty(RY_WT::get_option('ecpay_shipping_sender_phone'))) {
-            if (1 !== preg_match('@^\(0\d{1,2}\)\d{6,8}(#\d+)?$@', RY_WT::get_option('ecpay_shipping_sender_phone'))) {
+        $api_info = RY_WT::get_option('ecpay_shipping_apiinfo', []);
+
+        if (is_array($api_info) && isset($api_info['phone']) && !empty($api_info['phone'])) {
+            if (! preg_match('@^\(0\d{1,2}\)\d{6,8}(#\d+)?$@', $api_info['phone'])) {
                 WC_Admin_Settings::add_error(__('Verification failed!', 'ry-woocommerce-tools') . ' ' . __('Phone format (0x)xxxxxxx#xx', 'ry-woocommerce-tools'));
-                RY_WT::update_option('ecpay_shipping_sender_phone', '');
+                $api_info['phone'] = '';
+                RY_WT::update_option('ecpay_shipping_apiinfo', $api_info, false);
             }
         }
-        if (1 !== preg_match('@^09\d{8}?$@', RY_WT::get_option('ecpay_shipping_sender_cellphone'))) {
-            WC_Admin_Settings::add_error(__('Verification failed!', 'ry-woocommerce-tools') . ' ' . __('Cellphone format 09xxxxxxxx', 'ry-woocommerce-tools'));
-            RY_WT::update_option('ecpay_shipping_sender_cellphone', '');
+
+        if (is_array($api_info) && isset($api_info['cellphone']) && !empty($api_info['cellphone'])) {
+            if (!preg_match('@^09\d{8}?$@', $api_info['cellphone'])) {
+                WC_Admin_Settings::add_error(__('Verification failed!', 'ry-woocommerce-tools') . ' ' . __('Cellphone format 09xxxxxxxx', 'ry-woocommerce-tools'));
+                $api_info['cellphone'] = '';
+                RY_WT::update_option('ecpay_shipping_apiinfo', $api_info, false);
+            }
         }
-        if (!preg_match('/^[a-z0-9]*$/i', RY_WT::get_option('ecpay_shipping_order_prefix'))) {
-            WC_Admin_Settings::add_error(__('Order no prefix only letters and numbers allowed', 'ry-woocommerce-tools'));
-            RY_WT::update_option('ecpay_shipping_order_prefix', '');
+
+        if (is_array($api_info) && isset($api_info['prefix'])) {
+            if (!preg_match('/^[a-z0-9]{0,3}$/i', $api_info['prefix'])) {
+                WC_Admin_Settings::add_error(__('Order no prefix only letters and numbers allowed, and maximum length is 3 characters.', 'ry-woocommerce-tools'));
+                $api_info['prefix'] = '';
+                RY_WT::update_option('ecpay_shipping_apiinfo', $api_info, false);
+            }
         }
     }
 
     public function print_shipping()
     {
-        if (!wp_verify_nonce(($_GET['_wpnonce'] ?? ''), 'ry-print-shipping')) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash , WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+        if (!wp_verify_nonce(($_GET['_wpnonce'] ?? ''), 'ry-print-shipping')) {
             wp_safe_redirect(admin_url('edit.php?post_type=shop_order'));
-            exit();
+            exit;
         }
 
         $order_ID = sanitize_text_field(wp_unslash($_GET['orderid'] ?? ''));
         $logistics_ID = sanitize_locale_name($_GET['id'] ?? '');
-        $mode = sanitize_key($_GET['mode'] ?? '');
         $print_list = [];
 
         if (empty($logistics_ID)) {
@@ -135,11 +130,6 @@ final class RY_WT_WC_ECPay_Shipping_Admin
                                     $print_list[] = $info;
                                 }
                                 break;
-                            case 'OKMARTC2C':
-                                if ($get_type == 'cvs_ok') {
-                                    $print_list[] = $info;
-                                }
-                                break;
                             case 'TCAT':
                                 if ($get_type == 'home_tcat') {
                                     $print_list[] = $info;
@@ -156,7 +146,7 @@ final class RY_WT_WC_ECPay_Shipping_Admin
             }
         } else {
             $order = wc_get_order($order_ID);
-            if (!empty($order)) {
+            if ($order) {
                 $shipping_list = $order->get_meta('_ecpay_shipping_info', true);
                 if (is_array($shipping_list)) {
                     foreach ($shipping_list as $info) {
@@ -171,21 +161,21 @@ final class RY_WT_WC_ECPay_Shipping_Admin
         if (empty($print_list)) {
             wp_safe_redirect(admin_url('edit.php?post_type=shop_order'));
         } else {
-            RY_WT_WC_ECPay_Shipping_Api::instance()->get_print_form($print_list, $mode);
+            RY_WT_WC_ECPay_Shipping_Api::instance()->get_print_form($print_list);
         }
-        exit();
+        exit;
     }
 
-    public function get_shipping_info()
+    public function get_shipping_note()
     {
-        check_ajax_referer('get-shipping-info');
+        check_ajax_referer('get-shipping-note');
 
         $order_ID = intval($_POST['orderid'] ?? '');
 
         $order = wc_get_order($order_ID);
-        if (!empty($order)) {
-            $collection = 'Y' === wp_unslash($_POST['collection'] ?? ''); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-            $temp = substr(wp_unslash($_POST['temp'] ?? ''), 0, 1); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+        if ($order) {
+            $collection = 'Y' === wp_unslash($_POST['collection'] ?? '');
+            $temp = substr(wp_unslash($_POST['temp'] ?? ''), 0, 1);
             if (empty($temp)) {
                 $temp = null;
             }

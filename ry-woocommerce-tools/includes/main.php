@@ -8,7 +8,7 @@ final class RY_WT
 
     public const MIN_WC_VERSION = '9.0.0';
 
-    public const MIN_PRO_TOOLS_VERSION = '3.7.4';
+    public const MIN_PRO_TOOLS_VERSION = '3.8.0';
 
     protected static ?self $_instance = null;
 
@@ -80,6 +80,11 @@ final class RY_WT
         if ('yes' === self::get_option('enabled_newebpay_shipping', 'no')) {
             include_once RY_WT_PLUGIN_DIR . 'woocommerce/shipping/newebpay/shipping.php';
             RY_WT_WC_NewebPay_Shipping::instance();
+        }
+
+        if ('yes' === self::get_option('enabled_payuni_gateway', 'no')) {
+            include_once RY_WT_PLUGIN_DIR . 'woocommerce/gateways/payuni/gateway.php';
+            RY_WT_WC_PAYUNi_Gateway::instance();
         }
 
         if ('yes' === self::get_option('enabled_smilepay_gateway', 'no')) {

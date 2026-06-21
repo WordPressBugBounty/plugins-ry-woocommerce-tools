@@ -24,18 +24,20 @@ return [
     ],
     [
         'title' => __('Order no prefix', 'ry-woocommerce-tools'),
-        'id' => RY_WT::OPTION_PREFIX . 'ecpay_gateway_order_prefix',
+        'id' => RY_WT::OPTION_PREFIX . 'ecpay_gateway_apiinfo[prefix]',
         'type' => 'text',
         'desc' => __('The prefix string of order no. Only letters and numbers allowed.', 'ry-woocommerce-tools'),
         'desc_tip' => true,
+        'autoload' => false,
     ],
     [
         'title' => __('payment item name', 'ry-woocommerce-tools'),
-        'id' => RY_WT::OPTION_PREFIX . 'payment_item_name',
+        'id' => RY_WT::OPTION_PREFIX . 'ecpay_gateway_apiinfo[item_name]',
         'type' => 'text',
         'default' => '',
         'desc' => __('If empty use the first product name.', 'ry-woocommerce-tools'),
         'desc_tip' => true,
+        'autoload' => false,
     ],
     [
         'id' => 'base_options',
@@ -47,30 +49,34 @@ return [
         'type' => 'title',
     ],
     [
-        'title' => __('ECPay gateway sandbox', 'ry-woocommerce-tools'),
-        'id' => RY_WT::OPTION_PREFIX . 'ecpay_gateway_testmode',
+        'title' => __('Sandbox', 'ry-woocommerce-tools'),
+        'id' => RY_WT::OPTION_PREFIX . 'ecpay_gateway_apiinfo[testmode]',
         'type' => 'checkbox',
         'default' => 'no',
-        'desc' => __('Enable ECPay gateway sandbox', 'ry-woocommerce-tools')
+        'desc' => __('Enable sandbox', 'ry-woocommerce-tools')
             . '<p class="description">' . __('Note: Recommend using this for development purposes only.', 'ry-woocommerce-tools') . '<p>',
+        'autoload' => false,
     ],
     [
         'title' => _x('MerchantID', 'ECPay', 'ry-woocommerce-tools'),
-        'id' => RY_WT::OPTION_PREFIX . 'ecpay_gateway_MerchantID',
+        'id' => RY_WT::OPTION_PREFIX . 'ecpay_gateway_apiinfo[MerchantID]',
         'type' => 'text',
         'default' => '',
+        'autoload' => false,
     ],
     [
         'title' => _x('HashKey', 'ECPay', 'ry-woocommerce-tools'),
-        'id' => RY_WT::OPTION_PREFIX . 'ecpay_gateway_HashKey',
+        'id' => RY_WT::OPTION_PREFIX . 'ecpay_gateway_apiinfo[HashKey]',
         'type' => 'text',
         'default' => '',
+        'autoload' => false,
     ],
     [
         'title' => _x('HashIV', 'ECPay', 'ry-woocommerce-tools'),
-        'id' => RY_WT::OPTION_PREFIX . 'ecpay_gateway_HashIV',
+        'id' => RY_WT::OPTION_PREFIX . 'ecpay_gateway_apiinfo[HashIV]',
         'type' => 'text',
         'default' => '',
+        'autoload' => false,
     ],
     [
         'id' => 'api_options',

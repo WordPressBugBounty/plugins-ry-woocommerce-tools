@@ -70,22 +70,15 @@ final class RY_WT_WC_ECPay_Gateway extends RY_WT_Model
             return;
         }
 
-        switch ($order->get_payment_method()) {
-            case 'ry_ecpay_atm':
-                $template_file = 'order/order-ecpay-payment-info-atm.php';
-                break;
-            case 'ry_ecpay_barcode':
-                $template_file = 'order/order-ecpay-payment-info-barcode.php';
-                break;
-            case 'ry_ecpay_bnpl':
-                $template_file = 'order/order-ecpay-payment-info-bnpl.php';
-                break;
-            case 'ry_ecpay_cvs':
-                $template_file = 'order/order-ecpay-payment-info-cvs.php';
-                break;
-        }
+        $template_file = match ($order->get_payment_method()) {
+            RY_ECPay_Gateway_Atm::ID => 'order/order-ecpay-payment-info-atm.php',
+            RY_ECPay_Gateway_Barcode::ID => 'order/order-ecpay-payment-info-barcode.php',
+            RY_ECPay_Gateway_Bnpl::ID => 'order/order-ecpay-payment-info-bnpl.php',
+            RY_ECPay_Gateway_Cvs::ID => 'order/order-ecpay-payment-info-cvs.php',
+            default => '',
+        };
 
-        if (isset($template_file)) {
+        if ($template_file !== '') {
             $args = [
                 'order' => $order,
             ];
@@ -95,16 +88,26 @@ final class RY_WT_WC_ECPay_Gateway extends RY_WT_Model
 
     public function get_api_info()
     {
-        $MerchantID = RY_WT::get_option('ecpay_gateway_MerchantID');
-        if ($this->is_testmode()) {
-            $MerchantID = '3002607';
-            $HashKey = 'pwFHCqoQZGmho4w6';
-            $HashIV = 'EkRm7iFT261dpevs';
-        } else {
-            $HashKey = RY_WT::get_option('ecpay_gateway_HashKey');
-            $HashIV = RY_WT::get_option('ecpay_gateway_HashIV');
+        $api_info = RY_WT::get_option('ecpay_gateway_apiinfo', []);
+        if (!is_array($api_info)) {
+            $api_info = [];
+        }
+        $api_info = array_merge([
+            'prefix' => '',
+            'itemname' => '',
+            'testmode' => 'no',
+            'MerchantID' => '',
+            'HashKey' => '',
+            'HashIV' => '',
+        ], $api_info);
+        $api_info['testmode'] = wc_string_to_bool($api_info['testmode']);
+
+        if ($api_info['testmode'] === true) {
+            $api_info['MerchantID'] = '3002607';
+            $api_info['HashKey'] = 'pwFHCqoQZGmho4w6';
+            $api_info['HashIV'] = 'EkRm7iFT261dpevs';
         }
 
-        return [$MerchantID, $HashKey, $HashIV];
+        return $api_info;
     }
 }

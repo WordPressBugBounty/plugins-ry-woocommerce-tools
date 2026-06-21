@@ -16,30 +16,22 @@ abstract class RY_WT_SmilePay_Api extends RY_WT_Api
     {
         wc_set_time_limit(40);
 
-        return wp_remote_post($url . '?' . http_build_query($args, '', '&'), [
+        return wp_remote_post($url, [
             'timeout' => $timeout,
+            'body' => $args,
             'user-agent' => apply_filters('http_headers_useragent', 'WordPress/' . get_bloginfo('version')),
         ]);
     }
 
-    protected function clean_post_data($change_convert = false)
+    protected function convert_encoding($ipn_info)
     {
-        if ($change_convert) {
-            if (function_exists('mb_convert_encoding')) {
-                foreach ($_POST as $key => $value) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-                    if (!is_array($value)) {
-                        $_POST[$key] = mb_convert_encoding($value, 'UTF-8', 'BIG-5');
-                    } else {
-                        unset($_POST[$key]);
-                    }
+        if (function_exists('mb_convert_encoding')) {
+            foreach ($ipn_info as $key => $value) {
+                if (!is_array($value)) {
+                    $ipn_info[$key] = mb_convert_encoding($value, 'UTF-8', 'BIG-5');
+                } else {
+                    $ipn_info[$key] = $this->convert_encoding($value);
                 }
-            }
-        }
-
-        $ipn_info = [];
-        foreach ($_POST as $key => $value) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-            if (!is_array($value)) {
-                $ipn_info[$key] = wp_unslash($value);
             }
         }
 
@@ -70,38 +62,22 @@ abstract class RY_WT_SmilePay_Api extends RY_WT_Api
         return false;
     }
 
-    protected function get_check_value($ipn_info)
+    protected function get_hash_value($ipn_info)
     {
-        if (isset($ipn_info['Mid_smilepay'])) {
-            return $ipn_info['Mid_smilepay'];
-        }
-
-        return false;
+        return $ipn_info['Mid_smilepay'] ?? false;
     }
 
     protected function get_order_id($ipn_info, $order_prefix = '')
     {
         if (isset($ipn_info['Data_id'])) {
             $order_ID = $this->trade_no_to_order_no($ipn_info['Data_id'], $order_prefix);
-            $order_ID = apply_filters('ry_smilepay_trade_no_to_order_id', $order_ID, $ipn_info['Data_id']);
+            $order_ID = (int) apply_filters('ry_smilepay_trade_no_to_order_id', $order_ID, $ipn_info['Data_id']);
             if ($order_ID > 0) {
                 return $order_ID;
             }
         }
 
         return false;
-    }
-
-    protected function set_transaction_info($order, $result, $payment_type)
-    {
-        $transaction_ID = (string) $order->get_transaction_id();
-        if ($transaction_ID == '' || !$order->is_paid() || $transaction_ID != $this->get_transaction_id($result)) {
-            $order->set_transaction_id($this->get_transaction_id($result));
-            $order->update_meta_data('_smilepay_payment_type', $payment_type);
-            $order->save();
-            $order = wc_get_order($order->get_id());
-        }
-        return $order;
     }
 
     protected function die_success()

@@ -4,17 +4,17 @@ defined('ABSPATH') or exit;
 
 class RY_ECPay_Gateway_Credit extends RY_WT_WC_ECPay_Payment_Gateway
 {
-    public const Payment_Type = 'Credit';
+    public const ID = 'ry_ecpay_credit';
+
+    public const PAYMENT_TYPE = 'Credit';
+
+    public const bool SUPPORT_REFUND = true;
 
     public $support_applepay = 'yes';
 
-    protected int $check_min_amount = 6;
-
-    protected int $check_max_amount = 199999;
-
     public function __construct()
     {
-        $this->id = 'ry_ecpay_credit';
+        $this->id = self::ID;
         $this->has_fields = false;
         $this->order_button_text = __('Pay via Credit', 'ry-woocommerce-tools');
         $this->method_title = __('ECPay Credit ( include "Apple Pay" )', 'ry-woocommerce-tools');

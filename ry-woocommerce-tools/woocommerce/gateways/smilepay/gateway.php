@@ -71,22 +71,15 @@ final class RY_WT_WC_SmilePay_Gateway extends RY_WT_Model
             return;
         }
 
-        switch ($order->get_payment_method()) {
-            case 'ry_smilepay_atm':
-                $template_file = 'order/order-smilepay-payment-info-atm.php';
-                break;
-            case 'ry_smilepay_barcode':
-                $template_file = 'order/order-smilepay-payment-info-barcode.php';
-                break;
-            case 'ry_smilepay_cvs_711':
-                $template_file = 'order/order-smilepay-payment-info-cvs-711.php';
-                break;
-            case 'ry_smilepay_cvs_fami':
-                $template_file = 'order/order-smilepay-payment-info-cvs-fami.php';
-                break;
-        }
+        $template_file = match ($order->get_payment_method()) {
+            RY_SmilePay_Gateway_Atm::ID => 'order/order-smilepay-payment-info-atm.php',
+            RY_SmilePay_Gateway_Barcode::ID => 'order/order-smilepay-payment-info-barcode.php',
+            RY_SmilePay_Gateway_Cvs_711::ID => 'order/order-smilepay-payment-info-cvs-711.php',
+            RY_SmilePay_Gateway_Cvs_Fami::ID => 'order/order-smilepay-payment-info-cvs-fami.php',
+            default => '',
+        };
 
-        if (isset($template_file)) {
+        if ($template_file !== '') {
             $args = [
                 'order' => $order,
             ];
@@ -96,18 +89,28 @@ final class RY_WT_WC_SmilePay_Gateway extends RY_WT_Model
 
     public function get_api_info()
     {
-        if ($this->is_testmode()) {
-            $Dcvc = '107';
-            $Rvg2c = '1';
-            $Verify_key = '174A02F97A95F72CE301137B3F98D128';
-            $Rot_check = '1111';
-        } else {
-            $Dcvc = RY_WT::get_option('smilepay_gateway_Dcvc');
-            $Rvg2c = RY_WT::get_option('smilepay_gateway_Rvg2c');
-            $Verify_key = RY_WT::get_option('smilepay_gateway_Verify_key');
-            $Rot_check = RY_WT::get_option('smilepay_gateway_Rot_check');
+        $api_info = RY_WT::get_option('smilepay_gateway_apiinfo', []);
+        if (!is_array($api_info)) {
+            $api_info = [];
+        }
+        $api_info = array_merge([
+            'prefix' => '',
+            'itemname' => '',
+            'testmode' => 'no',
+            'Dcvc' => '',
+            'Rvg2c' => '',
+            'Verify_key' => '',
+            'Rot_check' => '',
+        ], $api_info);
+        $api_info['testmode'] = wc_string_to_bool($api_info['testmode']);
+
+        if ($api_info['testmode'] === true) {
+            $api_info['Dcvc'] = '107';
+            $api_info['Rvg2c'] = '1';
+            $api_info['Verify_key'] = '174A02F97A95F72CE301137B3F98D128';
+            $api_info['Rot_check'] = '1111';
         }
 
-        return [$Dcvc, $Rvg2c, $Verify_key, $Rot_check];
+        return $api_info;
     }
 }

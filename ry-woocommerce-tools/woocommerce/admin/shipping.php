@@ -38,7 +38,7 @@ final class RY_WT_WC_Admin_Shipping
         wp_enqueue_script('ry-admin-shipping', RY_WT_PLUGIN_URL . 'assets/admin/ry-shipping.js', $asset_info['dependencies'], $asset_info['version'], true);
         wp_localize_script('ry-admin-shipping', 'RyAdminShippingParams', [
             '_nonce' => [
-                'get' => wp_create_nonce('get-shipping-info'),
+                'get' => wp_create_nonce('get-shipping-note'),
                 'delete' => wp_create_nonce('delete-shipping-info'),
                 'smilepay' => wp_create_nonce('smilepay-shipping-no'),
             ],
@@ -52,17 +52,17 @@ final class RY_WT_WC_Admin_Shipping
 
     public function save_order_update($order_ID)
     {
-        if (isset($_POST['_shipping_cvs_store_ID'])) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+        if (isset($_POST['_shipping_cvs_store_ID'])) {
             $order = wc_get_order($order_ID);
             $shipping_method = $this->get_ry_shipping_method($order);
             if ($shipping_method && str_contains($shipping_method, '_cvs')) {
                 remove_action('woocommerce_update_order', [$this, 'save_order_update']);
 
-                $order->update_meta_data('_shipping_cvs_store_ID', sanitize_text_field(wp_unslash($_POST['_shipping_cvs_store_ID'] ?? ''))); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-                $order->update_meta_data('_shipping_cvs_store_name', sanitize_text_field(wp_unslash($_POST['_shipping_cvs_store_name'] ?? ''))); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-                $order->update_meta_data('_shipping_cvs_store_address', sanitize_text_field(wp_unslash($_POST['_shipping_cvs_store_address'] ?? ''))); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-                $order->update_meta_data('_shipping_cvs_store_telephone', sanitize_text_field(wp_unslash($_POST['_shipping_cvs_store_telephone'] ?? ''))); // phpcs:ignore WordPress.Security.NonceVerification.Missing
-                $order->set_shipping_address_1(sanitize_text_field(wp_unslash($_POST['_shipping_cvs_store_address'] ?? ''))); // phpcs:ignore WordPress.Security.NonceVerification.Missing
+                $order->update_meta_data('_shipping_cvs_store_ID', sanitize_text_field(wp_unslash($_POST['_shipping_cvs_store_ID'] ?? '')));
+                $order->update_meta_data('_shipping_cvs_store_name', sanitize_text_field(wp_unslash($_POST['_shipping_cvs_store_name'] ?? '')));
+                $order->update_meta_data('_shipping_cvs_store_address', sanitize_text_field(wp_unslash($_POST['_shipping_cvs_store_address'] ?? '')));
+                $order->update_meta_data('_shipping_cvs_store_telephone', sanitize_text_field(wp_unslash($_POST['_shipping_cvs_store_telephone'] ?? '')));
+                $order->set_shipping_address_1(sanitize_text_field(wp_unslash($_POST['_shipping_cvs_store_address'] ?? '')));
                 $order->save();
 
                 add_action('woocommerce_update_order', [$this, 'save_order_update']);
@@ -147,15 +147,15 @@ final class RY_WT_WC_Admin_Shipping
         check_ajax_referer('delete-shipping-info');
 
         $order_ID = intval($_POST['orderid'] ?? '');
-        $logistics_ID = sanitize_locale_name($_POST['id'] ?? '');
+        $shipping_ID = sanitize_locale_name($_POST['id'] ?? '');
 
         $order = wc_get_order($order_ID);
-        if (!empty($order)) {
+        if ($order) {
             foreach (['_ecpay_shipping_info', '_newebpay_shipping_info', '_smilepay_shipping_info'] as $meta_key) {
                 $shipping_list = $order->get_meta($meta_key, true);
                 if (is_array($shipping_list)) {
                     foreach ($shipping_list as $idx => $info) {
-                        if ($info['ID'] === $logistics_ID) {
+                        if ($info['ID'] === $shipping_ID) {
                             unset($shipping_list[$idx]);
                             $order->update_meta_data($meta_key, $shipping_list);
                             $order->save();

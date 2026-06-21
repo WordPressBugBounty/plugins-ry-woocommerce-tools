@@ -71,13 +71,19 @@ final class RY_WT_WC_Admin_Settings extends WC_Settings_Page
                 }
             }
 
+            if ('yes' === RY_WT::get_option('enabled_payuni_gateway', 'no')) {
+                if (!function_exists('openssl_encrypt') || !function_exists('openssl_decrypt')) {
+                    WC_Admin_Settings::add_error(__('PAYUNi gateway required PHP function `openssl_encrypt` and `openssl_decrypt`.', 'ry-woocommerce-tools'));
+                    RY_WT::update_option('enabled_payuni_gateway', 'no');
+                }
+            }
+
             if ('yes' === RY_WT::get_option('enabled_smilepay_gateway', 'no')) {
                 if (!function_exists('simplexml_load_string')) {
                     WC_Admin_Settings::add_error(__('SmilePay gateway method need PHP function `simplexml_load_string`.', 'ry-woocommerce-tools'));
                     RY_WT::update_option('enabled_smilepay_gateway', 'no');
                 }
             }
-
             if ('yes' === RY_WT::get_option('enabled_smilepay_shipping', 'no')) {
                 if ('no' === RY_WT::get_option('enabled_smilepay_gateway', 'no')) {
                     WC_Admin_Settings::add_error(__('SmilePay shipping method need enable SmilePay gateway.', 'ry-woocommerce-tools'));
@@ -92,92 +98,72 @@ final class RY_WT_WC_Admin_Settings extends WC_Settings_Page
     public function get_settings($current_section = '')
     {
         $checkout_with_block = CartCheckoutUtils::is_checkout_block_default();
-
         $settings = [];
         if ($current_section == '') {
+            wp_enqueue_script('ry-admin-options');
             $settings = [
                 [
-                    'title' => __('ECPay support', 'ry-woocommerce-tools'),
+                    'title' => __('Service provider', 'ry-woocommerce-tools'),
+                    'desc' => (wc_checkout_is_https() ? '' : __('For correct link to service provider API, need enable secure checkout.', 'ry-woocommerce-tools')),
                     'type' => 'title',
-                    'id' => 'ecpay_support',
+                    'id' => 'service_provider',
                 ],
                 [
-                    'title' => __('Gateway method', 'ry-woocommerce-tools'),
-                    'desc' => __('Enable ECPay gateway method', 'ry-woocommerce-tools')
-                        . (wc_checkout_is_https() ? '' : '<br>' . __('For correct link with ECPay API, need enable secure checkout.', 'ry-woocommerce-tools'))
-                        /* translators: %s: link to RY Tools (Pro) for WooCommerce */
-                        . ($checkout_with_block || defined('RY_WTP_VERSION') ? '' : '<br>' . sprintf(__('Need %s to support block checkout.', 'ry-woocommerce-tools'), '<a href="https://ry-plugin.com/ry-woocommerce-tools-pro">RY Tools (Pro) for WooCommerce</a>')),
+                    'title' => __('ECPay support', 'ry-woocommerce-tools'),
+                    'desc' => __('Enable ECPay gateway method', 'ry-woocommerce-tools'),
                     'id' => RY_WT::OPTION_PREFIX . 'enabled_ecpay_gateway',
                     'type' => 'checkbox',
                     'default' => 'no',
+                    'checkboxgroup' => 'start',
                 ],
                 [
-                    'title' => __('Shipping method', 'ry-woocommerce-tools'),
-                    'desc' => __('Enable ECPay shipping method', 'ry-woocommerce-tools')
-                        . (wc_checkout_is_https() ? '' : '<br>' . __('For correct link with ECPay API, need enable secure checkout.', 'ry-woocommerce-tools')),
+                    'desc' => __('Enable ECPay shipping method', 'ry-woocommerce-tools'),
                     'id' => RY_WT::OPTION_PREFIX . 'enabled_ecpay_shipping',
                     'type' => 'checkbox',
                     'default' => 'no',
+                    'checkboxgroup' => 'end',
                 ],
-                [
-                    'type' => 'sectionend',
-                    'id' => 'ecpay_support',
-                ],
-
                 [
                     'title' => __('NewebPay support', 'ry-woocommerce-tools'),
-                    'type' => 'title',
-                    'id' => 'newebpay_support',
-                ],
-                [
-                    'title' => __('Gateway method', 'ry-woocommerce-tools'),
-                    'desc' => __('Enable NewebPay gateway method', 'ry-woocommerce-tools')
-                        . (wc_checkout_is_https() ? '' : '<br>' . __('For correct link with NewebPay API, need enable secure checkout.', 'ry-woocommerce-tools'))
-                        /* translators: %s: link to RY Tools (Pro) for WooCommerce */
-                        . ($checkout_with_block || defined('RY_WTP_VERSION') ? '' : '<br>' . sprintf(__('Need %s to support block checkout.', 'ry-woocommerce-tools'), '<a href="https://ry-plugin.com/ry-woocommerce-tools-pro">RY Tools (Pro) for WooCommerce</a>')),
+                    'desc' => __('Enable NewebPay gateway method', 'ry-woocommerce-tools'),
                     'id' => RY_WT::OPTION_PREFIX . 'enabled_newebpay_gateway',
                     'type' => 'checkbox',
                     'default' => 'no',
+                    'checkboxgroup' => 'start',
                 ],
                 [
-                    'title' => __('Shipping method', 'ry-woocommerce-tools'),
-                    'desc' => __('Enable NewebPay shipping method', 'ry-woocommerce-tools')
-                        . (wc_checkout_is_https() ? '' : '<br>' . __('For correct link with NewebPay API, need enable secure checkout.', 'ry-woocommerce-tools')),
+                    'desc' => __('Enable NewebPay shipping method', 'ry-woocommerce-tools'),
                     'id' => RY_WT::OPTION_PREFIX . 'enabled_newebpay_shipping',
                     'type' => 'checkbox',
                     'default' => 'no',
+                    'checkboxgroup' => 'end',
                 ],
                 [
-                    'type' => 'sectionend',
-                    'id' => 'newebpay_support',
+                    'title' => __('PAYUNi support', 'ry-woocommerce-tools'),
+                    'desc' => __('Enable PAYUNi gateway method', 'ry-woocommerce-tools'),
+                    'id' => RY_WT::OPTION_PREFIX . 'enabled_payuni_gateway',
+                    'type' => 'checkbox',
+                    'default' => 'no',
                 ],
-
                 [
                     'title' => __('SmilePay support', 'ry-woocommerce-tools'),
-                    'type' => 'title',
-                    'id' => 'smilepay_support',
-                ],
-                [
-                    'title' => __('Gateway method', 'ry-woocommerce-tools'),
-                    'desc' => __('Enable SmilePay gateway method', 'ry-woocommerce-tools')
-                        . (wc_checkout_is_https() ? '' : '<br>' . __('For correct link with SmilePay API, need enable secure checkout.', 'ry-woocommerce-tools'))
-                        /* translators: %s: link to RY Tools (Pro) for WooCommerce */
-                        . ($checkout_with_block || defined('RY_WTP_VERSION') ? '' : '<br>' . sprintf(__('Need %s to support block checkout.', 'ry-woocommerce-tools'), '<a href="https://ry-plugin.com/ry-woocommerce-tools-pro">RY Tools (Pro) for WooCommerce</a>')),
+                    'desc' => __('Enable SmilePay gateway method', 'ry-woocommerce-tools'),
                     'id' => RY_WT::OPTION_PREFIX . 'enabled_smilepay_gateway',
                     'type' => 'checkbox',
                     'default' => 'no',
+                    'checkboxgroup' => 'start',
                 ],
                 [
-                    'title' => __('Shipping method', 'ry-woocommerce-tools'),
-                    'desc' => __('Enable SmilePay shipping method', 'ry-woocommerce-tools')
-                        . (wc_checkout_is_https() ? '' : '<br>' . __('For correct link with SmilePay API, need enable secure checkout.', 'ry-woocommerce-tools')),
+                    'desc' => __('Enable SmilePay shipping method', 'ry-woocommerce-tools'),
                     'id' => RY_WT::OPTION_PREFIX . 'enabled_smilepay_shipping',
                     'type' => 'checkbox',
                     'default' => 'no',
+                    'checkboxgroup' => 'end',
                 ],
+
                 [
                     'type' => 'sectionend',
-                    'id' => 'smilepay_support',
+                    'id' => 'service_provider',
                 ],
                 [
                     'title' => __('General options', 'ry-woocommerce-tools'),
@@ -205,17 +191,6 @@ final class RY_WT_WC_Admin_Settings extends WC_Settings_Page
                     'id' => RY_WT::OPTION_PREFIX . 'show_unpay_title',
                     'type' => 'checkbox',
                     'default' => 'yes',
-                    'autoload' => false,
-                ],
-                [
-                    'title' => sprintf(
-                        /* translators: %s: Weight unit */
-                        __('Product default weight (%s)', 'ry-woocommerce-tools'),
-                        I18nUtil::get_weight_unit_label(get_option('woocommerce_weight_unit')),
-                    ),
-                    'id' => RY_WT::OPTION_PREFIX . 'shipping_product_weight',
-                    'type' => 'text',
-                    'default' => '0',
                     'autoload' => false,
                 ],
                 [
@@ -251,6 +226,43 @@ final class RY_WT_WC_Admin_Settings extends WC_Settings_Page
                 [
                     'type' => 'sectionend',
                     'id' => 'checkout_page_options',
+                ],
+                [
+                    'title' => __('Shipping options', 'ry-woocommerce-tools'),
+                    'type' => 'title',
+                    'id' => 'shipping_options',
+                ],
+                [
+                    'title' => sprintf(
+                        /* translators: %s: Weight unit */
+                        __('Product default weight (%s)', 'ry-woocommerce-tools'),
+                        I18nUtil::get_weight_unit_label(get_option('woocommerce_weight_unit')),
+                    ),
+                    'id' => RY_WT::OPTION_PREFIX . 'shipping_apiinfo[weight]',
+                    'type' => 'number',
+                    'default' => '0',
+                    'step' => '0.001',
+                    'autoload' => false,
+                ],
+                [
+                    'title' => __('Shipping box size', 'ry-woocommerce-tools'),
+                    'id' => RY_WT::OPTION_PREFIX . 'shipping_apiinfo[boxsize]',
+                    'type' => 'select',
+                    'default' => '1',
+                    'options' => [
+                        '0' => _x('By product', 'box size', 'ry-woocommerce-tools'),
+                        '1' => _x('60 cm', 'box size', 'ry-woocommerce-tools'),
+                        '2' => _x('90 cm', 'box size', 'ry-woocommerce-tools'),
+                        '3' => _x('120 cm', 'box size', 'ry-woocommerce-tools'),
+                        '4' => _x('150 cm', 'box size', 'ry-woocommerce-tools'),
+                    ],
+                    'desc' => __('By product is set box size to the biggest product size.', 'ry-woocommerce-tools'),
+                    'desc_tip' => true,
+                    'autoload' => false,
+                ],
+                [
+                    'type' => 'sectionend',
+                    'id' => 'shipping_options',
                 ],
             ];
 

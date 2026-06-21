@@ -24,18 +24,20 @@ return [
     ],
     [
         'title' => __('Order no prefix', 'ry-woocommerce-tools'),
-        'id' => RY_WT::OPTION_PREFIX . 'newebpay_gateway_order_prefix',
+        'id' => RY_WT::OPTION_PREFIX . 'newebpay_gateway_apiinfo[prefix]',
         'type' => 'text',
         'desc' => __('The prefix string of order no. Only letters and numbers allowed.', 'ry-woocommerce-tools'),
         'desc_tip' => true,
+        'autoload' => false,
     ],
     [
         'title' => __('payment item name', 'ry-woocommerce-tools'),
-        'id' => RY_WT::OPTION_PREFIX . 'payment_item_name',
+        'id' => RY_WT::OPTION_PREFIX . 'newebpay_gateway_apiinfo[item_name]',
         'type' => 'text',
         'default' => '',
         'desc' => __('If empty use the first product name.', 'ry-woocommerce-tools'),
         'desc_tip' => true,
+        'autoload' => false,
     ],
     [
         'id' => 'base_options',
@@ -47,30 +49,34 @@ return [
         'type' => 'title',
     ],
     [
-        'title' => __('NewebPay gateway sandbox', 'ry-woocommerce-tools'),
-        'id' => RY_WT::OPTION_PREFIX . 'newebpay_gateway_testmode',
+        'title' => __('Sandbox', 'ry-woocommerce-tools'),
+        'id' => RY_WT::OPTION_PREFIX . 'newebpay_gateway_apiinfo[testmode]',
         'type' => 'checkbox',
         'default' => 'no',
-        'desc' => __('Enable NewebPay gateway sandbox', 'ry-woocommerce-tools')
+        'desc' => __('Enable sandbox', 'ry-woocommerce-tools')
             . '<p class="description">' . __('Note: Recommend using this for development purposes only.', 'ry-woocommerce-tools') . '<p>',
+        'autoload' => false,
     ],
     [
         'title' => _x('MerchantID', 'NewebPay', 'ry-woocommerce-tools'),
-        'id' => RY_WT::OPTION_PREFIX . 'newebpay_gateway_MerchantID',
+        'id' => RY_WT::OPTION_PREFIX . 'newebpay_gateway_apiinfo[MerchantID]',
         'type' => 'text',
         'default' => '',
+        'autoload' => false,
     ],
     [
         'title' => _x('HashKey', 'NewebPay', 'ry-woocommerce-tools'),
-        'id' => RY_WT::OPTION_PREFIX . 'newebpay_gateway_HashKey',
+        'id' => RY_WT::OPTION_PREFIX . 'newebpay_gateway_apiinfo[HashKey]',
         'type' => 'text',
         'default' => '',
+        'autoload' => false,
     ],
     [
         'title' => _x('HashIV', 'NewebPay', 'ry-woocommerce-tools'),
-        'id' => RY_WT::OPTION_PREFIX . 'newebpay_gateway_HashIV',
+        'id' => RY_WT::OPTION_PREFIX . 'newebpay_gateway_apiinfo[HashIV]',
         'type' => 'text',
         'default' => '',
+        'autoload' => false,
     ],
     [
         'id' => 'api_options',

@@ -9,8 +9,8 @@ abstract class RY_WT_WC_ECPay_Shipping_Method extends RY_WT_WC_Shipping_Method
         $available = $this->is_enabled();
 
         if ($available) {
-            list($MerchantID, $HashKey, $HashIV) = RY_WT_WC_ECPay_Shipping::instance()->get_api_info();
-            if (!empty($MerchantID) && !empty($HashKey) && !empty($HashIV)) {
+            $api_info = RY_WT_WC_ECPay_Shipping::instance()->get_api_info();
+            if (!empty($api_info['MerchantID']) && !empty($api_info['HashKey']) && !empty($api_info['HashIV'])) {
                 $available = true;
             }
         }
@@ -24,18 +24,18 @@ abstract class RY_WT_WC_ECPay_Shipping_Method extends RY_WT_WC_Shipping_Method
 
     protected function add_rate_meta_data($rate)
     {
-        $rate['meta_data']['LogisticsType'] = get_called_class()::Shipping_Type;
+        $rate['meta_data']['LogisticsType'] = get_called_class()::SHIPPING_TYPE;
         $rate['meta_data']['LogisticsSubType'] = get_called_class()::Shipping_Sub_Type;
         if ('CVS' == $rate['meta_data']['LogisticsType']) {
-            list($MerchantID, $HashKey, $HashIV, $cvs_type) = RY_WT_WC_ECPay_Shipping::instance()->get_api_info();
-            if ('C2C' === $cvs_type) {
+            $api_info = RY_WT_WC_ECPay_Shipping::instance()->get_api_info();
+            if ('C2C' === RY_WT::get_option('ecpay_shipping_cvs_type', 'C2C')) {
                 $rate['meta_data']['LogisticsSubType'] .= 'C2C';
             }
         }
 
         $cvs_info = (array) WC()->session->get('ry_ecpay_cvs_info', []);
         if (isset($cvs_info['LogisticsSubType']) && str_starts_with($cvs_info['LogisticsSubType'], $rate['meta_data']['LogisticsSubType'])) {
-            $rate['meta_data']['LogisticsInfo'] = $cvs_info;
+            $rate['meta_data']['RYCvsInfo'] = $cvs_info;
         }
 
         return $rate;

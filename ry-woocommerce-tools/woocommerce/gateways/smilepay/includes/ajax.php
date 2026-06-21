@@ -20,42 +20,29 @@ final class RY_WT_WC_SmilePay_Gateway_Ajax
     {
         add_action('wp_ajax_RY_SmilePay_getcode', [$this, 'get_code']);
         add_action('wp_ajax_nopriv_RY_SmilePay_getcode', [$this, 'get_code']);
-        add_action('wp_ajax_RY_SmilePay_shipping_getcode', [$this, 'shipping_get_code']);
-        add_action('wp_ajax_nopriv_RY_SmilePay_shipping_getcode', [$this, 'shipping_get_code']);
     }
 
     public function get_code()
     {
         check_ajax_referer('smilepay-getcode');
 
-        $order_ID = intval($_GET['id'] ?? '');
+        $order_key = sanitize_locale_name($_POST['key'] ?? '');
+        $order_ID = intval($_POST['id'] ?? '');
         $order = wc_get_order($order_ID);
-        $url = false;
-        if ($order) {
-            $url = RY_WT_WC_SmilePay_Gateway_Api::instance()->get_code($order);
+        if ($order && hash_equals($order->get_order_key(), $order_key)) {
+            $gateways = WC_Payment_Gateways::instance();
+            $payment_gateways = $gateways->payment_gateways();
+            $payment_method = $order->get_payment_method();
+            if (isset($payment_gateways[$payment_method])) {
+                $gateway = $payment_gateways[$payment_method];
+                if (is_object($gateway) && $gateway instanceof RY_WT_WC_SmilePay_Payment_Gateway) {
+                    RY_WT_WC_SmilePay_Gateway_Api::instance()->get_code($order, $gateway);
+                }
+            }
+            echo esc_url_raw($order->get_checkout_order_received_url());
+        } else {
+            echo esc_url_raw(home_url('/'));
         }
-        if (!$url) {
-            $url = $order->get_checkout_order_received_url();
-        }
-        echo esc_url_raw($url);
-
-        wp_die();
-    }
-
-    public function shipping_get_code()
-    {
-        check_ajax_referer('smilepay-getcode');
-
-        $order_ID = intval($_GET['id'] ?? '');
-        $order = wc_get_order($order_ID);
-        $url = false;
-        if ($order) {
-            $url = RY_WT_WC_SmilePay_Shipping_Api::instance()->get_csv_info($order);
-        }
-        if (!$url) {
-            $url = $order->get_checkout_order_received_url();
-        }
-        echo esc_url_raw($url);
 
         wp_die();
     }

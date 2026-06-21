@@ -6,45 +6,66 @@ use Automattic\WooCommerce\Utilities\NumberUtil;
 
 abstract class RY_WT_Api
 {
-    protected bool $do_die = false;
-
-    protected function pre_generate_trade_no($order_ID, $order_prefix = '')
-    {
-        return $order_prefix . $order_ID . 'TS' . random_int(0, 9) . strrev((string) time());
-    }
-
-    protected function trade_no_to_order_no($trade_no, $order_prefix = '')
-    {
-        return (int) substr($trade_no, strlen($order_prefix), strrpos($trade_no, 'TS'));
-    }
-
-    protected function get_item_name($item_name, $order)
-    {
-        if (empty($item_name)) {
-            $items = $order->get_items();
-            if (count($items)) {
-                $item = reset($items);
-                $item_name = trim($item->get_name());
-            }
-        }
-        return str_replace(['^', '\'', '`', '!', '@', '＠', '#', '%', '&', '*', '+', '\\', '"', '<', '>', '|', '_', '[', ']'], '', $item_name);
-    }
+    private bool $do_die = false;
 
     public function gateway_return()
     {
-        $order_key = sanitize_locale_name($_GET['key'] ?? ''); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-        $order_ID = intval($_GET['id'] ?? ''); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+        $order_key = sanitize_locale_name($_GET['key'] ?? '');
+        $order_ID = intval($_GET['id'] ?? '');
         $order = wc_get_order($order_ID);
+
         if ($order && hash_equals($order->get_order_key(), $order_key)) {
-            $return_url = $order->get_checkout_order_received_url();
+            $return_url = wc_get_endpoint_url('order-received', $order->get_id(), wc_get_checkout_url());
+            $redirect_data = [
+                'key' => $order->get_order_key(),
+            ];
         } else {
             $return_url = wc_get_endpoint_url('order-received', '', wc_get_checkout_url());
+            $redirect_data = [];
         }
 
-        $return_url = apply_filters('woocommerce_get_return_url', $return_url, $order);
-        wp_safe_redirect($return_url);
+        $args = [
+            'method' => 'get',
+            'redirect_url' => apply_filters('woocommerce_get_return_url', $return_url, $order),
+            'redirect_data' => $redirect_data,
+        ];
+        wc_get_template('auto-redirect.php', $args, '', RY_WT_PLUGIN_DIR . 'templates/');
+        exit;
+    }
 
-        exit();
+    public function auto_submit_data(string $url, array $args): void
+    {
+        echo '<form method="post" id="ry-auto-submit-form" action="' . esc_url($url) . '">';
+        foreach ($args as $key => $value) {
+            echo '<input type="hidden" name="' . esc_attr($key) . '" value="' . esc_attr($value) . '">';
+        }
+        echo '</form>';
+
+        $this->submit_sctipt('document.getElementById("ry-auto-submit-form").submit();');
+    }
+
+    public function set_do_die()
+    {
+        $this->do_die = true;
+    }
+
+    public function set_not_do_die()
+    {
+        $this->do_die = false;
+    }
+
+    protected function die_success()
+    {
+        if ($this->do_die) {
+            exit('1|OK');
+        }
+    }
+
+    protected function die_error()
+    {
+        if ($this->do_die) {
+            exit('0|');
+        }
     }
 
     protected function submit_sctipt($action_script)
@@ -67,20 +88,32 @@ abstract class RY_WT_Api
             css: ' . wp_json_encode($css) . '
         });';
 
-        wp_register_script('ry-payment', '', [], RY_WT_VERSION);
+        wp_register_script('ry-payment', '', [], RY_WT_VERSION, true);
         wp_enqueue_script('wc-jquery-blockui');
         wp_enqueue_script('ry-payment');
         wp_add_inline_script('ry-payment', 'jQuery(function($) {' . $blockUI . ' setTimeout(function() { ' . $action_script . ' }, 150);' . '});');
     }
 
-    public function set_do_die()
+    protected function pre_generate_trade_no($order_ID, string $order_prefix = ''): string
     {
-        $this->do_die = true;
+        return $order_prefix . $order_ID . 'TS' . random_int(0, 9) . strrev((string) time());
     }
 
-    public function set_not_do_die()
+    protected function trade_no_to_order_no(string $trade_no, string $order_prefix = ''): int
     {
-        $this->do_die = false;
+        return (int) substr($trade_no, strlen($order_prefix), strrpos($trade_no, 'TS'));
+    }
+
+    protected function get_item_name($item_name, $order)
+    {
+        if (empty($item_name)) {
+            $items = $order->get_items();
+            if (count($items)) {
+                $item = reset($items);
+                $item_name = trim($item->get_name());
+            }
+        }
+        return str_replace(['^', '\'', '`', '!', '@', '＠', '#', '%', '&', '*', '+', '\\', '"', '<', '>', '|', '_', '[', ']'], '', $item_name);
     }
 
     protected function get_shipping_package($order, $method_class, $declare_over_type, $for_temp, $default_weight)
@@ -188,19 +221,5 @@ abstract class RY_WT_Api
         });
 
         return $package_list;
-    }
-
-    protected function die_success()
-    {
-        if ($this->do_die) {
-            exit('1|OK');
-        }
-    }
-
-    protected function die_error()
-    {
-        if ($this->do_die) {
-            exit('0|');
-        }
     }
 }

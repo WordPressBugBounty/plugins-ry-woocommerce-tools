@@ -10,16 +10,20 @@
  * happen. When this occurs the version of the template file will be bumped and
  * the readme will list any important changes.
  *
- * @version 3.0.6
+ * @version 4.0.0
  */
 
-if ('ry_ecpay_bnpl' !== $order->get_payment_method()) {
+if ($order->get_payment_method() !== 'ry_ecpay_bnpl') {
     return;
 }
 
-if ('BNPL' !== $order->get_meta('_ecpay_payment_type')) {
+if ($order->get_meta('_ecpay_payment_type') !== 'BNPL') {
     return;
 }
+
+$order_info = [
+    'installment' => $order->get_meta('_ecpay_bnpl_Installment'),
+];
 ?>
 <section class="woocommerce-order-details">
     <h2 class="woocommerce-order-details__title">
@@ -32,7 +36,7 @@ if ('BNPL' !== $order->get_meta('_ecpay_payment_type')) {
                     <?php esc_html_e('Installment', 'ry-woocommerce-tools'); ?>
                 </td>
                 <td>
-                    <?php echo esc_html($order->get_meta('_ecpay_bnpl_Installment')); ?>
+                    <?php echo esc_html($order_info['installment']); ?>
                 </td>
             </tr>
         </tbody>

@@ -30,17 +30,17 @@ class RY_WT_WC_NewebPay_Gateway_Api extends RY_WT_NewebPay_Api
         $notify_url = WC()->api_request_url('ry_newebpay_callback', true);
         $return_url = $this->get_3rd_return_url($order);
 
-        list($MerchantID, $HashKey, $HashIV) = RY_WT_WC_NewebPay_Gateway::instance()->get_api_info();
+        $api_info = RY_WT_WC_NewebPay_Gateway::instance()->get_api_info();
 
-        $item_name = $this->get_item_name(RY_WT::get_option('payment_item_name', ''), $order);
+        $item_name = $this->get_item_name($api_info['itemname'], $order);
         $item_name = mb_substr($item_name, 0, 40);
 
         $args = [
-            'MerchantID' => $MerchantID,
+            'MerchantID' => $api_info['MerchantID'],
             'RespondType' => 'JSON',
             'TimeStamp' => new DateTime('now', new DateTimeZone('Asia/Taipei')),
-            'Version' => '2.2',
-            'MerchantOrderNo' => $this->generate_trade_no($order->get_id(), RY_WT::get_option('newebpay_gateway_order_prefix')),
+            'Version' => '2.3',
+            'MerchantOrderNo' => $this->generate_trade_no($order->get_id(), $api_info['prefix']),
             'Amt' => (int) ceil($order->get_total()),
             'ItemDesc' => $item_name,
             'ReturnURL' => $return_url,
@@ -53,6 +53,7 @@ class RY_WT_WC_NewebPay_Gateway_Api extends RY_WT_NewebPay_Api
             'ANDROIDPAY' => 0,
             'SAMSUNGPAY' => 0,
             'LINEPAY' => 0,
+            'AFTEE' => 0,
             'InstFlag' => 0,
             'CreditRed' => 0,
             'UNIONPAY' => 0,
@@ -64,7 +65,7 @@ class RY_WT_WC_NewebPay_Gateway_Api extends RY_WT_NewebPay_Api
             'ESUNWALLET' => 0,
             'TAIWANPAY' => 0,
             'BITOPAY' => 0,
-            'EZPAY' => 0,
+            'TWQR' => 0,
             'EZPWECHAT' => 0,
             'EZPALIPAY' => 0,
             'CVSCOM' => 0,
@@ -75,7 +76,7 @@ class RY_WT_WC_NewebPay_Gateway_Api extends RY_WT_NewebPay_Api
             case 'zh_TW':
                 break;
             case 'ja':
-                $args['Language'] = 'jp';
+                $args['LangType'] = 'jp';
                 break;
             case 'en_US':
             case 'en_AU':
@@ -88,49 +89,44 @@ class RY_WT_WC_NewebPay_Gateway_Api extends RY_WT_NewebPay_Api
 
         $args = $this->add_type_info($args, $order, $gateway);
         $form_data = [
-            'MerchantID' => $MerchantID,
-            'TradeInfo' => $this->args_encrypt($args, $HashKey, $HashIV),
-            'Version' => '2.2',
+            'MerchantID' => $api_info['MerchantID'],
+            'TradeInfo' => $this->args_encrypt($args, $api_info['HashKey'], $api_info['HashIV']),
+            'Version' => '2.3',
             'EncryptType' => 0,
         ];
-        $form_data['TradeSha'] = $this->generate_hash_value($form_data['TradeInfo'], $HashKey, $HashIV);
-        RY_WT_WC_NewebPay_Gateway::instance()->log('Generating payment by ' . $gateway->id . ' for #' . $order->get_id(), WC_Log_Levels::INFO, ['form' => $form_data, 'data' => $args]);
+        $form_data['TradeSha'] = $this->generate_hash_value($form_data['TradeInfo'], $api_info['HashKey'], $api_info['HashIV']);
+        RY_WT_WC_NewebPay_Gateway::instance()->log('Generating payment by ' . $gateway->id . ' for #' . $order->get_id(), WC_Log_Levels::INFO, ['data' => $args]);
 
         $order->update_meta_data('_newebpay_MerchantOrderNo', $args['MerchantOrderNo']);
         $order->save();
 
-        if (RY_WT_WC_NewebPay_Gateway::instance()->is_testmode()) {
+        if ($api_info['testmode']) {
             $url = $this->api_test_url['checkout'];
         } else {
             $url = $this->api_url['checkout'];
         }
 
-        echo '<form method="post" id="ry-newebpay-form" action="' . esc_url($url) . '">';
-        foreach ($form_data as $key => $value) {
-            echo '<input type="hidden" name="' . esc_attr($key) . '" value="' . esc_attr($value) . '">';
-        }
-        echo '</form>';
-        $this->submit_sctipt('document.getElementById("ry-newebpay-form").submit();');
+        $this->auto_submit_data($url, $form_data);
 
         do_action('ry_newebpay_gateway_checkout', $args, $order, $gateway);
     }
 
     public function get_info($order)
     {
-        list($MerchantID, $HashKey, $HashIV) = RY_WT_WC_NewebPay_Gateway::instance()->get_api_info();
+        $api_info = RY_WT_WC_NewebPay_Gateway::instance()->get_api_info();
 
         $args = [
-            'MerchantID' => $MerchantID,
+            'MerchantID' => $api_info['MerchantID'],
             'Version' => '1.3',
             'RespondType' => 'JSON',
-            'TimeStamp' => new DateTime('', new DateTimeZone('Asia/Taipei')),
+            'TimeStamp' => new DateTime('now', new DateTimeZone('Asia/Taipei')),
             'MerchantOrderNo' => $order->get_meta('_newebpay_MerchantOrderNo', true),
             'Amt' => (int) ceil($order->get_total()),
         ];
         $args['TimeStamp'] = $args['TimeStamp']->getTimestamp();
-        $args['CheckValue'] = $this->generate_check_value($args, $HashKey, $HashIV);
+        $args['CheckValue'] = $this->generate_hash_value($args, $api_info['HashKey'], $api_info['HashIV']);
 
-        if (RY_WT_WC_NewebPay_Gateway::instance()->is_testmode()) {
+        if ($api_info['testmode']) {
             $url = $this->api_test_url['query'];
         } else {
             $url = $this->api_url['query'];
@@ -159,38 +155,21 @@ class RY_WT_WC_NewebPay_Gateway_Api extends RY_WT_NewebPay_Api
 
     protected function add_type_info($args, $order, $gateway)
     {
-        if (defined(get_class($gateway) . '::Payment_Type')) {
-            if (isset($args[$gateway::Payment_Type])) {
-                $args[$gateway::Payment_Type] = 1;
+        if (defined(get_class($gateway) . '::PAYMENT_TYPE')) {
+            if (isset($args[$gateway::PAYMENT_TYPE])) {
+                $args[$gateway::PAYMENT_TYPE] = 1;
             }
-            switch ($gateway::Payment_Type) {
+            switch ($gateway::PAYMENT_TYPE) {
                 case 'VACC':
                 case 'CVS':
                 case 'BARCODE':
-                    $now = new DateTime('', new DateTimeZone('Asia/Taipei'));
+                    $now = new DateTime('now', new DateTimeZone('Asia/Taipei'));
                     $now->add(new DateInterval('P' . $gateway->expire_date . 'D'));
                     $args['ExpireDate'] = $now->format('Ymd');
                     break;
                 case 'InstFlag':
                     if (isset($gateway->number_of_periods) && !empty($gateway->number_of_periods)) {
-                        if (is_array($gateway->number_of_periods)) {
-                            $number_of_periods = (int) $order->get_meta('_newebpay_payment_number_of_periods', true);
-                            if (!in_array($number_of_periods, $gateway->number_of_periods)) {
-                                $number_of_periods = 0;
-                            }
-                        } else {
-                            $number_of_periods = (int) $gateway->number_of_periods;
-                        }
-                        if (in_array($number_of_periods, [3, 6, 12, 18, 24, 30])) {
-                            $args['InstFlag'] = $number_of_periods;
-
-                            $order->add_order_note(sprintf(
-                                /* translators: %d number of periods */
-                                __('Credit installment to %d', 'ry-woocommerce-tools'),
-                                $number_of_periods,
-                            ));
-                            $order->save();
-                        }
+                        $args['InstFlag'] = implode(',', $gateway->number_of_periods);
                     }
                     break;
             }

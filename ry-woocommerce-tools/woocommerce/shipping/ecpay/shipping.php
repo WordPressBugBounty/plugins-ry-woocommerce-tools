@@ -10,7 +10,6 @@ final class RY_WT_WC_ECPay_Shipping extends RY_WT_Shipping_Model
         'ry_ecpay_shipping_cvs_711' => 'RY_ECPay_Shipping_CVS_711',
         'ry_ecpay_shipping_cvs_family' => 'RY_ECPay_Shipping_CVS_Family',
         'ry_ecpay_shipping_cvs_hilife' => 'RY_ECPay_Shipping_CVS_Hilife',
-        'ry_ecpay_shipping_cvs_ok' => 'RY_ECPay_Shipping_CVS_Ok',
         'ry_ecpay_shipping_home_post' => 'RY_ECPay_Shipping_Home_Post',
         'ry_ecpay_shipping_home_tcat' => 'RY_ECPay_Shipping_Home_Tcat',
     ];
@@ -42,7 +41,6 @@ final class RY_WT_WC_ECPay_Shipping extends RY_WT_Shipping_Model
         include_once RY_WT_PLUGIN_DIR . 'woocommerce/shipping/ecpay/shipping-cvs-711.php';
         include_once RY_WT_PLUGIN_DIR . 'woocommerce/shipping/ecpay/shipping-cvs-family.php';
         include_once RY_WT_PLUGIN_DIR . 'woocommerce/shipping/ecpay/shipping-cvs-hilife.php';
-        include_once RY_WT_PLUGIN_DIR . 'woocommerce/shipping/ecpay/shipping-cvs-ok.php';
         include_once RY_WT_PLUGIN_DIR . 'woocommerce/shipping/ecpay/shipping-home-post.php';
         include_once RY_WT_PLUGIN_DIR . 'woocommerce/shipping/ecpay/shipping-home-tcat.php';
 
@@ -79,12 +77,7 @@ final class RY_WT_WC_ECPay_Shipping extends RY_WT_Shipping_Model
 
     public function add_method($shipping_methods)
     {
-        $shipping_methods = array_merge($shipping_methods, self::$support_methods);
-        if ('B2C' === RY_WT::get_option('ecpay_shipping_cvs_type')) {
-            unset($shipping_methods['ry_ecpay_shipping_cvs_ok']);
-        }
-
-        return $shipping_methods;
+        return array_merge($shipping_methods, self::$support_methods);
     }
 
     public function add_cvs_info($fields)
@@ -132,11 +125,11 @@ final class RY_WT_WC_ECPay_Shipping extends RY_WT_Shipping_Model
     {
         if (isset(self::$support_methods[$item->get_method_id()])) {
             if ('CVS' === $item->get_meta('LogisticsType')) {
-                $this->save_order_cvs_info($order, $item->get_meta('LogisticsInfo'));
+                $this->save_order_cvs_info($order, $item->get_meta('RYCvsInfo'));
             }
             $item->delete_meta_data('LogisticsType');
             $item->delete_meta_data('LogisticsSubType');
-            $item->delete_meta_data('LogisticsInfo');
+            $item->delete_meta_data('RYCvsInfo');
         }
         WC()->session->set('ry_ecpay_cvs_info', []);
     }
@@ -195,7 +188,7 @@ final class RY_WT_WC_ECPay_Shipping extends RY_WT_Shipping_Model
                     'post_url' => RY_WT_WC_ECPay_Shipping_Api::instance()->get_map_post_url(),
                 ], '', RY_WT_PLUGIN_DIR . 'templates/');
 
-                list($MerchantID, $HashKey, $HashIV, $cvs_type) = $this->get_api_info();
+                $cvs_type = RY_WT::get_option('ecpay_shipping_cvs_type', 'C2C');
                 $method_class = self::$support_methods[$chosen_shipping];
 
                 $subtype = $method_class::Shipping_Sub_Type;
@@ -220,11 +213,13 @@ final class RY_WT_WC_ECPay_Shipping extends RY_WT_Shipping_Model
                         }
                     }
                 }
+                $api_info = $this->get_api_info();
                 $this->js_data['postData'] = [
-                    'MerchantID' => $MerchantID,
-                    'LogisticsType' => $method_class::Shipping_Type,
+                    'MerchantID' => $api_info['MerchantID'],
+                    'LogisticsType' => $method_class::SHIPPING_TYPE,
                     'LogisticsSubType' => $subtype,
                     'IsCollection' => 'Y',
+                    'Device' => wp_is_mobile() ? '1' : '0',
                     'ServerReplyURL' => esc_url(add_query_arg([
                         'ry-ecpay-map-redirect' => 'ry-ecpay-map-redirect',
                         'lang' => get_locale(),
@@ -241,8 +236,8 @@ final class RY_WT_WC_ECPay_Shipping extends RY_WT_Shipping_Model
 
     public function save_cvs_info()
     {
-        if (isset($_POST['ry-ecpay-cvsmap-info'])) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
-            $cvs_info = (array) json_decode(base64_decode(wp_unslash($_POST['ry-ecpay-cvsmap-info']), true), true); // phpcs:ignore WordPress.Security.NonceVerification.Missing , WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+        if (isset($_POST['ry-ecpay-cvsmap-info'])) {
+            $cvs_info = (array) json_decode(base64_decode(wp_unslash($_POST['ry-ecpay-cvsmap-info']), true), true);
             if (is_array($cvs_info) && 6 === count($cvs_info)) {
                 $cvs_info['shipping_methods'] = WC()->session->get('chosen_shipping_methods', []);
                 foreach ($cvs_info['shipping_methods'] as $package_key => $t) {
@@ -290,33 +285,42 @@ final class RY_WT_WC_ECPay_Shipping extends RY_WT_Shipping_Model
 
     public function get_api_info()
     {
-        $cvs_type = RY_WT::get_option('ecpay_shipping_cvs_type');
-        if ($this->is_testmode()) {
+        $api_info = RY_WT::get_option('ecpay_shipping_apiinfo', []);
+        if (!is_array($api_info)) {
+            $api_info = [];
+        }
+        $api_info = array_merge([
+            'prefix' => '',
+            'itemname' => '',
+            'name' => '',
+            'phone' => '',
+            'cellphone' => '',
+            'zipcode' => '',
+            'address' => '',
+            'declare_mode' => 'product',
+            'declare_over' => 'keep',
+            'cleanup_name' => 'no',
+            'testmode' => 'no',
+            'MerchantID' => '',
+            'HashKey' => '',
+            'HashIV' => '',
+        ], $api_info);
+        $api_info['testmode'] = wc_string_to_bool($api_info['testmode']);
+
+        if ($api_info['testmode'] === true) {
+            $cvs_type = RY_WT::get_option('ecpay_shipping_cvs_type', 'C2C');
             if ('C2C' === $cvs_type) {
-                $MerchantID = '2000933';
-                $HashKey = 'XBERn1YOvpM9nfZc';
-                $HashIV = 'h1ONHk4P4yqbl5LK';
-            } else {
-                $MerchantID = '2000132';
-                $HashKey = '5294y06JbISpM5x9';
-                $HashIV = 'v77hoKGq4kWxNNIS';
+                $api_info['MerchantID'] = '2000933';
+                $api_info['HashKey'] = 'XBERn1YOvpM9nfZc';
+                $api_info['HashIV'] = 'h1ONHk4P4yqbl5LK';
             }
-        } else {
-            $MerchantID = RY_WT::get_option('ecpay_shipping_MerchantID');
-            $HashKey = RY_WT::get_option('ecpay_shipping_HashKey');
-            $HashIV = RY_WT::get_option('ecpay_shipping_HashIV');
+            if ('B2C' === $cvs_type) {
+                $api_info['MerchantID'] = '2000132';
+                $api_info['HashKey'] = '5294y06JbISpM5x9';
+                $api_info['HashIV'] = 'v77hoKGq4kWxNNIS';
+            }
         }
 
-        return [$MerchantID, $HashKey, $HashIV, $cvs_type];
-    }
-
-    public function get_order_support_shipping($shipping_item)
-    {
-        $method_ID = $shipping_item->get_method_id();
-        if (isset(self::$support_methods[$method_ID])) {
-            return $method_ID;
-        }
-
-        return false;
+        return $api_info;
     }
 }

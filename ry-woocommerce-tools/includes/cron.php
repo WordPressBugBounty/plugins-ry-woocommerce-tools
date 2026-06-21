@@ -34,8 +34,8 @@ final class RY_WT_Cron
         }
 
         if ($ntp_time > 0) {
-            $time_diff = current_time('timestamp', true) - $ntp_time;
-            RY_WT::update_option('ntp_time_error', abs($time_diff) > MINUTE_IN_SECONDS);
+            $time_diff = abs(current_time('timestamp', true) - $ntp_time);
+            RY_WT::update_option('ntp_time_error', $time_diff > MINUTE_IN_SECONDS);
             return $time_diff;
         }
         return -1;
@@ -48,7 +48,7 @@ final class RY_WT_Cron
         $args = [
             'type' => 'shop_order',
             'return' => 'ids',
-            'meta_query' => [[ // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_meta_query
+            'meta_query' => [[
                 'key' => ['_ecpay_shipping_info', '_newebpay_shipping_info', '_smilepay_shipping_info'],
                 'compare_key' => 'IN',
                 'value' => 'LogisticsType',

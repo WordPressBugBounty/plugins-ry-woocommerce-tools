@@ -26,8 +26,8 @@ final class RY_WT_WC_SmilePay_Shipping_Admin
         add_action('add_meta_boxes', ['RY_SmilePay_Shipping_Meta_Box', 'add_meta_box'], 40, 2);
 
         add_action('admin_post_ry-print-smilepay-shipping', [$this, 'print_shipping']);
-        add_action('wp_ajax_RY_smilepay_shipping_info', [$this, 'get_shipping_info']);
-        add_action('wp_ajax_RY_smilepay_shipping_no', [$this, 'get_shipping_no']);
+        add_action('wp_ajax_RY_smilepay_get_shipping_note', [$this, 'get_shipping_note']);
+        add_action('wp_ajax_RY_smilepay_get_shipping_no', [$this, 'get_shipping_no']);
     }
 
     public function add_meta_box($post_type, $data_object)
@@ -56,9 +56,9 @@ final class RY_WT_WC_SmilePay_Shipping_Admin
 
     public function print_shipping()
     {
-        if (!wp_verify_nonce(($_GET['_wpnonce'] ?? ''), 'ry-print-shipping')) { // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.MissingUnslash , WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+        if (!wp_verify_nonce(($_GET['_wpnonce'] ?? ''), 'ry-print-shipping')) {
             wp_safe_redirect(admin_url('edit.php?post_type=shop_order'));
-            exit();
+            exit;
         }
 
         $order_ID = intval($_GET['orderid'] ?? '');
@@ -108,7 +108,7 @@ final class RY_WT_WC_SmilePay_Shipping_Admin
             }
         } else {
             $order = wc_get_order($order_ID);
-            if (!empty($order)) {
+            if ($order) {
                 $shipping_list = $order->get_meta('_smilepay_shipping_info', true);
                 if (is_array($shipping_list)) {
                     foreach ($shipping_list as $info) {
@@ -130,19 +130,19 @@ final class RY_WT_WC_SmilePay_Shipping_Admin
         } else {
             RY_WT_WC_SmilePay_Shipping_Api::instance()->get_print_url($print_list, $print_type);
         }
-        exit();
+        exit;
     }
 
-    public function get_shipping_info()
+    public function get_shipping_note()
     {
-        check_ajax_referer('get-shipping-info');
+        check_ajax_referer('get-shipping-note');
 
         $order_ID = intval($_POST['orderid'] ?? '');
 
         $order = wc_get_order($order_ID);
-        if (!empty($order)) {
-            $collection = 'Y' === wp_unslash($_POST['collection'] ?? ''); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
-            $temp = substr(wp_unslash($_POST['temp'] ?? ''), 0, 1); // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized
+        if ($order) {
+            $collection = 'Y' === wp_unslash($_POST['collection'] ?? '');
+            $temp = substr(wp_unslash($_POST['temp'] ?? ''), 0, 1);
             if (empty($temp)) {
                 $temp = null;
             }
@@ -151,7 +151,8 @@ final class RY_WT_WC_SmilePay_Shipping_Admin
                 $shipping_method = RY_WT_WC_SmilePay_Shipping::instance()->get_order_support_shipping($shipping_item);
                 if ($shipping_method) {
                     if (str_contains($shipping_method, '_cvs')) {
-                        $url = RY_WT_WC_SmilePay_Shipping_Api::instance()->get_admin_csv_info($order, $collection);
+                        list($url, $args) = RY_WT_WC_SmilePay_Shipping_Api::instance()->get_code_info($order, $collection, true);
+                        $url = add_query_arg($args, $url);
                         echo esc_url_raw($url);
                     } else {
                         RY_WT_WC_SmilePay_Shipping_Api::instance()->get_home_info($order, $collection);
@@ -172,7 +173,7 @@ final class RY_WT_WC_SmilePay_Shipping_Admin
         $logistics_ID = sanitize_locale_name($_POST['id'] ?? '');
 
         $order = wc_get_order($order_ID);
-        if (!empty($order)) {
+        if ($order) {
             $shipping_list = $order->get_meta('_smilepay_shipping_info', true);
             if (is_array($shipping_list)) {
                 foreach ($shipping_list as $info) {

@@ -1,0 +1,58 @@
+<?php defined('ABSPATH') or exit; ?>
+
+<?php
+/**
+ * This template can be overridden by copying it to yourtheme/woocommerce/order/order-ecpay-payment-info-cvs.php
+ *
+ * HOWEVER, on occasion RY Tools for WooCommerce will need to update template files and you
+ * (the theme developer) will need to copy the new files to your theme to
+ * maintain compatibility. We try to do this as little as possible, but it does
+ * happen. When this occurs the version of the template file will be bumped and
+ * the readme will list any important changes.
+ *
+ * @version 4.0.0
+ */
+
+if ($order->get_payment_method() !== 'ry_payuni_cvs') {
+    return;
+}
+
+if ($order->get_meta('_payuni_payment_type') !== '3') {
+    return;
+}
+
+$order_info = [
+    'paymentNo' => $order->get_meta('_payuni_cvs_PaymentNo'),
+    'expireDate' => wc_string_to_datetime($order->get_meta('_payuni_cvs_ExpireDate')),
+];
+?>
+<section class="woocommerce-order-details">
+    <h2 class="woocommerce-order-details__title">
+        <?php esc_html_e('Payment details', 'ry-woocommerce-tools'); ?>
+    </h2>
+    <table class="woocommerce-table woocommerce-table--payment-details payment_details">
+        <tbody>
+            <tr>
+                <td>
+                    <?php esc_html_e('CVS code', 'ry-woocommerce-tools'); ?>
+                </td>
+                <td>
+                    <?php echo esc_html($order_info['paymentNo']); ?>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <?php esc_html_e('Payment deadline', 'ry-woocommerce-tools'); ?>
+                </td>
+                <td>
+                    <?php echo esc_html(sprintf(
+                        /* translators: %1$s: date %2$s: time */
+                        _x('%1$s %2$s', 'Datetime', 'ry-woocommerce-tools'),
+                        $order_info['expireDate']->date_i18n(wc_date_format()),
+                        $order_info['expireDate']->date_i18n(wc_time_format()),
+                    )); ?>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</section>

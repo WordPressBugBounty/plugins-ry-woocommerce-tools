@@ -22,10 +22,24 @@ final class RY_WT_WC_Admin
 
         include_once RY_WT_PLUGIN_DIR . 'woocommerce/admin/product.php';
 
+        add_action('admin_enqueue_scripts', [$this, 'add_scripts']);
+
         add_filter('woocommerce_get_settings_pages', [$this, 'get_settings_page']);
         add_filter('woocommerce_get_sections_rytools', [$this, 'add_sections'], 11);
         add_filter('ry_setting_section_tools', '__return_false');
         add_action('ry_setting_section_ouput_tools', [$this, 'output_tools']);
+    }
+
+    public function add_scripts()
+    {
+        $asset_info = include RY_WT_PLUGIN_DIR . 'assets/admin/ry-options.asset.php';
+
+        wp_register_script('ry-admin-options', RY_WT_PLUGIN_URL . 'assets/admin/ry-options.js', $asset_info['dependencies'], $asset_info['version'], true);
+        wp_localize_script('ry-admin-options', 'RyAdminOptionsParams', [
+            'i18n' => [
+                'title' => __('Shipping options', 'ry-woocommerce-tools'),
+            ],
+        ]);
     }
 
     public function get_settings_page($settings)
@@ -49,7 +63,7 @@ final class RY_WT_WC_Admin
 
         $hide_save_button = true;
 
-        if (isset($_POST['ryt_check_time']) && 'ryt_check_time' === $_POST['ryt_check_time']) { // phpcs:ignore WordPress.Security.NonceVerification.Missing
+        if (isset($_POST['ryt_check_time']) && 'ryt_check_time' === $_POST['ryt_check_time']) {
             $difftime = RY_WT_Cron::check_ntp_time();
             if ($difftime === -1) {
                 printf(
@@ -58,7 +72,7 @@ final class RY_WT_WC_Admin
                 );
             } else {
                 printf(
-                    '<div class="notice notice-success is-dismissible"><p><strong>%s</strong></p></div>',
+                    '<div class="notice notice-' . ($difftime > MINUTE_IN_SECONDS ? 'info' : 'success') . ' is-dismissible"><p><strong>%s</strong></p></div>',
                     esc_html(sprintf(
                         /* translators: %d: differ time (second) */
                         _n('Check server time success. Difference: %d second', 'Check server time success. Difference: %d seconds', $difftime, 'ry-woocommerce-tools'),
