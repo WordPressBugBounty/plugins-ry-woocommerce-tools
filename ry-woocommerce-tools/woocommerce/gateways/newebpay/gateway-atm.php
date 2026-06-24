@@ -8,6 +8,8 @@ class RY_NewebPay_Gateway_Atm extends RY_WT_WC_NewebPay_Payment_Gateway
 
     public const PAYMENT_TYPE = 'VACC';
 
+    public const INFO_TEMPLATE = 'order-newebpay-payment-info-atm.php';
+
     protected int $check_min_amount = 16;
 
     protected int $check_max_amount = 49999;
@@ -20,8 +22,6 @@ class RY_NewebPay_Gateway_Atm extends RY_WT_WC_NewebPay_Payment_Gateway
         $this->has_fields = false;
         $this->order_button_text = __('Pay via ATM', 'ry-woocommerce-tools');
         $this->method_title = __('NewebPay ATM', 'ry-woocommerce-tools');
-        $this->method_description = '';
-        $this->process_payment_note = __('Pay via NewebPay ATM', 'ry-woocommerce-tools');
 
         $this->form_fields = include RY_WT_PLUGIN_DIR . 'woocommerce/gateways/newebpay/includes/settings/atm.php';
 

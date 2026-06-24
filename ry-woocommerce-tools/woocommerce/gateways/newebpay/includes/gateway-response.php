@@ -173,31 +173,34 @@ class RY_WT_WC_NewebPay_Gateway_Response extends RY_WT_NewebPay_Api
 
         if (isset($info_value->PayTime) && !empty($info_value->PayTime)) {
             $order->add_order_note(__('NewebPay payment completed', 'ry-woocommerce-tools'));
-            if (isset($info_value->Inst) && !empty($info_value->Inst)) {
-                $order->add_order_note(sprintf(
-                    /* translators: %d number of periods */
-                    __('Credit installment to %d', 'ry-woocommerce-tools'),
-                    $info_value->Inst,
-                ));
+            if (isset($info_value->Inst)) {
+                $installment = (int) $info_value->Inst;
+                if ($installment > 1) {
+                    $order->add_order_note(sprintf(
+                        /* translators: %d number of periods */
+                        __('Credit installment to %d', 'ry-woocommerce-tools'),
+                        $installment,
+                    ));
+                }
             }
 
             $order->payment_complete();
         } else {
             switch ($order->get_payment_method()) {
-                case RY_NewebPay_Gateway_Atm::ID:
+                case 'ry_newebpay_atm':
                     $expireDate = new DateTime($info_value->ExpireDate . ' ' . $info_value->ExpireTime, new DateTimeZone('Asia/Taipei'));
                     $order->update_meta_data('_newebpay_atm_BankCode', $info_value->BankCode);
                     $order->update_meta_data('_newebpay_atm_vAccount', $info_value->CodeNo);
                     $order->update_meta_data('_newebpay_atm_ExpireDate', $expireDate->format(DATE_ATOM));
                     $order->update_status('on-hold');
                     break;
-                case RY_NewebPay_Gateway_Cvs::ID:
+                case 'ry_newebpay_cvs':
                     $expireDate = new DateTime($info_value->ExpireDate . ' ' . $info_value->ExpireTime, new DateTimeZone('Asia/Taipei'));
                     $order->update_meta_data('_newebpay_cvs_PaymentNo', $info_value->CodeNo);
                     $order->update_meta_data('_newebpay_cvs_ExpireDate', $expireDate->format(DATE_ATOM));
                     $order->update_status('on-hold');
                     break;
-                case RY_NewebPay_Gateway_Barcode::ID:
+                case 'ry_newebpay_barcode':
                     $expireDate = new DateTime($info_value->ExpireDate . ' ' . $info_value->ExpireTime, new DateTimeZone('Asia/Taipei'));
                     $order->update_meta_data('_newebpay_barcode_Barcode1', $info_value->Barcode_1);
                     $order->update_meta_data('_newebpay_barcode_Barcode2', $info_value->Barcode_2);

@@ -8,6 +8,8 @@ class RY_ECPay_Gateway_Cvs extends RY_WT_WC_ECPay_Payment_Gateway
 
     public const PAYMENT_TYPE = 'CVS';
 
+    public const INFO_TEMPLATE = 'order-ecpay-payment-info-cvs.php';
+
     protected int $check_min_amount = 31;
 
     protected int $check_max_amount = 6000;
@@ -20,8 +22,6 @@ class RY_ECPay_Gateway_Cvs extends RY_WT_WC_ECPay_Payment_Gateway
         $this->has_fields = false;
         $this->order_button_text = __('Pay via CVS', 'ry-woocommerce-tools');
         $this->method_title = __('ECPay CVS', 'ry-woocommerce-tools');
-        $this->method_description = '';
-        $this->process_payment_note = __('Pay via ECPay CVS', 'ry-woocommerce-tools');
 
         $this->form_fields = include RY_WT_PLUGIN_DIR . 'woocommerce/gateways/ecpay/includes/settings/cvs.php';
 

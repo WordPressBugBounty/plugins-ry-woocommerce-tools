@@ -8,6 +8,8 @@ class RY_ECPay_Gateway_Barcode extends RY_WT_WC_ECPay_Payment_Gateway
 
     public const PAYMENT_TYPE = 'BARCODE';
 
+    public const INFO_TEMPLATE = 'order-ecpay-payment-info-barcode.php';
+
     protected int $check_min_amount = 16;
 
     protected int $check_max_amount = 20000;
@@ -20,8 +22,6 @@ class RY_ECPay_Gateway_Barcode extends RY_WT_WC_ECPay_Payment_Gateway
         $this->has_fields = false;
         $this->order_button_text = __('Pay via BARCODE', 'ry-woocommerce-tools');
         $this->method_title = __('ECPay BARCODE', 'ry-woocommerce-tools');
-        $this->method_description = '';
-        $this->process_payment_note = __('Pay via ECPay BARCODE', 'ry-woocommerce-tools');
 
         $this->form_fields = include RY_WT_PLUGIN_DIR . 'woocommerce/gateways/ecpay/includes/settings/barcode.php';
 

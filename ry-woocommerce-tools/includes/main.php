@@ -8,7 +8,7 @@ final class RY_WT
 
     public const MIN_WC_VERSION = '9.0.0';
 
-    public const MIN_PRO_TOOLS_VERSION = '3.8.2';
+    public const MIN_PRO_TOOLS_VERSION = '3.8.3';
 
     protected static ?self $_instance = null;
 
@@ -46,6 +46,7 @@ final class RY_WT
 
         include_once RY_WT_PLUGIN_DIR . 'woocommerce/abstracts/abstract-api.php';
         include_once RY_WT_PLUGIN_DIR . 'woocommerce/abstracts/abstract-model.php';
+        include_once RY_WT_PLUGIN_DIR . 'woocommerce/abstracts/abstract-gateway-model.php';
         include_once RY_WT_PLUGIN_DIR . 'woocommerce/abstracts/abstract-shipping-model.php';
         include_once RY_WT_PLUGIN_DIR . 'woocommerce/abstracts/abstract-wc-payment-gateway.php';
         include_once RY_WT_PLUGIN_DIR . 'woocommerce/abstracts/abstract-wc-shipping-method.php';
