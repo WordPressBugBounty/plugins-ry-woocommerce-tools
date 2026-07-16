@@ -2,15 +2,19 @@
 
 defined('ABSPATH') or exit;
 
-final class RY_WT
+use RY\General\AbstractBasic;
+
+final class RY_WT extends AbstractBasic
 {
     public const OPTION_PREFIX = 'RY_WT_';
 
+    public const PLUGIN_NAME = 'RY Tools for WooCommerce';
+
     public const MIN_WC_VERSION = '9.0.0';
 
-    public const MIN_PRO_TOOLS_VERSION = '3.8.3';
+    public const MIN_PRO_TOOLS_VERSION = '2026.7.16';
 
-    protected static ?self $_instance = null;
+    private static ?self $_instance = null;
 
     public static function instance(): RY_WT
     {
@@ -28,7 +32,7 @@ final class RY_WT
             include_once RY_WT_PLUGIN_DIR . 'includes/update.php';
             RY_WT_Update::update();
 
-            include_once RY_WT_PLUGIN_DIR . 'includes/admin.php';
+            include_once RY_WT_PLUGIN_DIR . 'admin/admin.php';
             RY_WT_Admin::instance();
         }
 
@@ -109,21 +113,6 @@ final class RY_WT
             $asset_info = include RY_WT_PLUGIN_DIR . 'assets/ry-payment.asset.php';
             wp_enqueue_style('ry-payment', RY_WT_PLUGIN_URL . 'assets/ry-payment.css', [], $asset_info['version']);
         }
-    }
-
-    public static function get_option(string $option, mixed $default = false): mixed
-    {
-        return get_option(self::OPTION_PREFIX . $option, $default);
-    }
-
-    public static function update_option(string $option, mixed $value, ?bool $autoload = null)
-    {
-        return update_option(self::OPTION_PREFIX . $option, $value, $autoload);
-    }
-
-    public static function delete_option(string $option)
-    {
-        return delete_option(self::OPTION_PREFIX . $option);
     }
 
     public static function plugin_activation(): void

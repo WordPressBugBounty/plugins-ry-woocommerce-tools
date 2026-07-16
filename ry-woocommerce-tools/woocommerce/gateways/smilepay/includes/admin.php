@@ -6,7 +6,7 @@ use Automattic\WooCommerce\Blocks\Utils\CartCheckoutUtils;
 
 final class RY_WT_WC_SmilePay_Gateway_Admin
 {
-    protected static ?self $_instance = null;
+    private static ?self $_instance = null;
 
     public static function instance(): RY_WT_WC_SmilePay_Gateway_Admin
     {
@@ -41,14 +41,6 @@ final class RY_WT_WC_SmilePay_Gateway_Admin
                     /* translators: %s: link to RY Tools (Pro) for WooCommerce */
                     __('Need %s to support block checkout.', 'ry-woocommerce-tools'),
                     '<a href="https://ry-plugin.com/ry-woocommerce-tools-pro">RY Tools (Pro) for WooCommerce</a>',
-                ) . '</p>';
-            }
-
-            if (!defined('RY_WEI_VERSION') && !defined('RY_WSI_VERSION') && !defined('RY_WEZI_VERSION')) {
-                $settings[0]['desc'] .= '<p>' . sprintf(
-                    /* translators: %s: link to RY SmilePay Invoice for WooCommerce */
-                    __('If you need SmilePay Invoice support, you can try %s', 'ry-woocommerce-tools'),
-                    '<a href="https://ry-plugin.com/ry-woocommerce-smilepay-invoice">RY SmilePay Invoice for WooCommerce</a>',
                 ) . '</p>';
             }
         }
