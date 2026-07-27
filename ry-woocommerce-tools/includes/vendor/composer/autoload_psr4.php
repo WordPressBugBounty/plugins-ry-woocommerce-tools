@@ -6,5 +6,5 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname(dirname($vendorDir));
 
 return array(
-    'RY\\General\\' => array($baseDir . '/includes/ry-general'),
+    'RY\\General\\V20260724\\' => array($baseDir . '/includes/ry-general'),
 );

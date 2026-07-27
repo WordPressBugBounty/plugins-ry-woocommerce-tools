@@ -9,12 +9,12 @@ class ComposerStaticInite64032c2ab3e25fb5a5bdf407e2d65ee
     public static $prefixLengthsPsr4 = array (
         'R' =>
         array (
-            'RY\\General\\' => 11,
+            'RY\\General\\V20260724\\' => 21,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
-        'RY\\General\\' =>
+        'RY\\General\\V20260724\\' =>
         array (
             0 => __DIR__ . '/../../..' . '/includes/ry-general',
         ),
@@ -22,11 +22,17 @@ class ComposerStaticInite64032c2ab3e25fb5a5bdf407e2d65ee
 
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
-        'RY\\General\\AbstractAdmin' => __DIR__ . '/../../..' . '/includes/ry-general/AbstractAdmin.php',
-        'RY\\General\\AbstractAdminPage' => __DIR__ . '/../../..' . '/includes/ry-general/AbstractAdminPage.php',
-        'RY\\General\\AbstractBasic' => __DIR__ . '/../../..' . '/includes/ry-general/AbstractBasic.php',
-        'RY\\General\\Logs' => __DIR__ . '/../../..' . '/includes/ry-general/Logs.php',
-        'RY\\General\\Page\\Logs' => __DIR__ . '/../../..' . '/includes/ry-general/Page/Logs.php',
+        'RY\\General\\V20260727\\AbstractAdmin' => __DIR__ . '/../../..' . '/includes/ry-general/AbstractAdmin.php',
+        'RY\\General\\V20260727\\AbstractAdminPage' => __DIR__ . '/../../..' . '/includes/ry-general/AbstractAdminPage.php',
+        'RY\\General\\V20260727\\AbstractBasic' => __DIR__ . '/../../..' . '/includes/ry-general/AbstractBasic.php',
+        'RY\\General\\V20260727\\AbstractLinkServer' => __DIR__ . '/../../..' . '/includes/ry-general/AbstractLinkServer.php',
+        'RY\\General\\V20260727\\ActionScheduler' => __DIR__ . '/../../..' . '/includes/ry-general/ActionScheduler.php',
+        'RY\\General\\V20260727\\ActionScheduler\\ListTable' => __DIR__ . '/../../..' . '/includes/ry-general/ActionScheduler/ListTable.php',
+        'RY\\General\\V20260727\\ActionScheduler\\View' => __DIR__ . '/../../..' . '/includes/ry-general/ActionScheduler/View.php',
+        'RY\\General\\V20260727\\Logs' => __DIR__ . '/../../..' . '/includes/ry-general/Logs.php',
+        'RY\\General\\V20260727\\Page\\Logs' => __DIR__ . '/../../..' . '/includes/ry-general/Page/Logs.php',
+        'RY\\General\\V20260727\\Page\\Option' => __DIR__ . '/../../..' . '/includes/ry-general/Page/Option.php',
+        'RY\\General\\V20260727\\Utils' => __DIR__ . '/../../..' . '/includes/ry-general/Utils.php',
     );
 
     public static function getInitializer(ClassLoader $loader)
