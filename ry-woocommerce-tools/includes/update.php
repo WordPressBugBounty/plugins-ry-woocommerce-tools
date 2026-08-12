@@ -2,7 +2,7 @@
 
 defined('ABSPATH') or exit;
 
-use RY\General\V20260801\Logs;
+use RY\General\V20260810\Logs;
 
 final class RY_WT_Update
 {
@@ -331,8 +331,8 @@ final class RY_WT_Update
             });
         }
 
-        if (version_compare($now_version, '2026.8.7', '<')) {
-            RY_WT::update_option('version', '2026.8.7', true);
+        if (version_compare($now_version, '2026.8.12', '<')) {
+            RY_WT::update_option('version', '2026.8.12', true);
         }
     }
 }
