@@ -9,11 +9,21 @@ class ComposerStaticInite64032c2ab3e25fb5a5bdf407e2d65ee
     public static $prefixLengthsPsr4 = array (
         'R' =>
         array (
+            'RY\\WooCommerce\\Admin\\' => 21,
+            'RY\\WooCommerce\\' => 15,
             'RY\\General\\V20260810\\' => 21,
         ),
     );
 
     public static $prefixDirsPsr4 = array (
+        'RY\\WooCommerce\\Admin\\' =>
+        array (
+            0 => __DIR__ . '/../../..' . '/admin',
+        ),
+        'RY\\WooCommerce\\' =>
+        array (
+            0 => __DIR__ . '/../../..' . '/classes',
+        ),
         'RY\\General\\V20260810\\' =>
         array (
             0 => __DIR__ . '/../../..' . '/includes/ry-general',
@@ -33,6 +43,11 @@ class ComposerStaticInite64032c2ab3e25fb5a5bdf407e2d65ee
         'RY\\General\\V20260810\\Page\\Logs' => __DIR__ . '/../../..' . '/includes/ry-general/Page/Logs.php',
         'RY\\General\\V20260810\\Page\\Option' => __DIR__ . '/../../..' . '/includes/ry-general/Page/Option.php',
         'RY\\General\\V20260810\\Utils' => __DIR__ . '/../../..' . '/includes/ry-general/Utils.php',
+        'RY\\WooCommerce\\Admin\\Admin' => __DIR__ . '/../../..' . '/admin/Admin.php',
+        'RY\\WooCommerce\\Cron' => __DIR__ . '/../../..' . '/classes/Cron.php',
+        'RY\\WooCommerce\\LinkServer' => __DIR__ . '/../../..' . '/classes/LinkServer.php',
+        'RY\\WooCommerce\\Main' => __DIR__ . '/../../..' . '/classes/Main.php',
+        'RY\\WooCommerce\\Update' => __DIR__ . '/../../..' . '/classes/Update.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

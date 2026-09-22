@@ -18,4 +18,9 @@ return array(
     'RY\\General\\V20260810\\Page\\Logs' => $baseDir . '/includes/ry-general/Page/Logs.php',
     'RY\\General\\V20260810\\Page\\Option' => $baseDir . '/includes/ry-general/Page/Option.php',
     'RY\\General\\V20260810\\Utils' => $baseDir . '/includes/ry-general/Utils.php',
+    'RY\\WooCommerce\\Admin\\Admin' => $baseDir . '/admin/Admin.php',
+    'RY\\WooCommerce\\Cron' => $baseDir . '/classes/Cron.php',
+    'RY\\WooCommerce\\LinkServer' => $baseDir . '/classes/LinkServer.php',
+    'RY\\WooCommerce\\Main' => $baseDir . '/classes/Main.php',
+    'RY\\WooCommerce\\Update' => $baseDir . '/classes/Update.php',
 );

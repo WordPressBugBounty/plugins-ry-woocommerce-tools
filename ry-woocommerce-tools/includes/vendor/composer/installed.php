@@ -20,9 +20,9 @@
             'dev_requirement' => false,
         ),
         'woocommerce/action-scheduler' => array(
-            'pretty_version' => '4.1.0',
-            'version' => '4.1.0.0',
-            'reference' => '40a3df93a251590c58717b91b1049a13410e2ac4',
+            'pretty_version' => '4.2.0',
+            'version' => '4.2.0.0',
+            'reference' => '9e2c6b02e89652bade4445ea2ca5fb12e0fa7242',
             'type' => 'wordpress-plugin',
             'install_path' => __DIR__ . '/../woocommerce/action-scheduler',
             'aliases' => array(),

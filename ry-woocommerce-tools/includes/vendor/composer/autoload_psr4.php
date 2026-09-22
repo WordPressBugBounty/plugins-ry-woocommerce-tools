@@ -6,5 +6,7 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname(dirname($vendorDir));
 
 return array(
+    'RY\\WooCommerce\\Admin\\' => array($baseDir . '/admin'),
+    'RY\\WooCommerce\\' => array($baseDir . '/classes'),
     'RY\\General\\V20260810\\' => array($baseDir . '/includes/ry-general'),
 );

@@ -1,0 +1,61 @@
+<?php
+
+namespace RY\WooCommerce\Admin;
+
+defined('ABSPATH') or exit;
+
+use RY\General\V20260810\AbstractAdmin;
+use RY\WooCommerce\Main;
+
+final class Admin extends AbstractAdmin
+{
+    private static ?self $_instance = null;
+
+    public static function instance(): Admin
+    {
+        if (null === self::$_instance) {
+            self::$_instance = new self();
+            self::$_instance->do_init();
+        }
+
+        return self::$_instance;
+    }
+
+    protected function do_init(): void
+    {
+        add_action('admin_notices', [$this, 'need_woocommerce']);
+        add_action('admin_notices', [$this, 'show_time_error']);
+
+        add_filter('plugin_action_links_' . RY_WT_PLUGIN_BASENAME, [$this, 'plugin_action_links'], 10);
+    }
+
+    public function need_woocommerce(): void
+    {
+        if (!defined('WC_VERSION') || version_compare(WC_VERSION, Main::MIN_WC_VERSION, '<')) {
+            $message = sprintf(
+                /* translators: %1$s: Name of this plugin %2$s: min require version */
+                __('<strong>%1$s</strong> is inactive. It require WooCommerce version %2$s or newer.', 'ry-woocommerce-tools'),
+                __('RY Tools for WooCommerce', 'ry-woocommerce-tools'),
+                Main::MIN_WC_VERSION,
+            );
+            printf('<div class="error"><p>%s</p></div>', wp_kses($message, ['strong' => []]));
+        }
+    }
+
+    public function show_time_error(): void
+    {
+        if (Main::get_option('ntp_time_error', false)) {
+            printf(
+                '<div class="notice notice-error"><p>%s</p></div>',
+                esc_html__('Please check your server time setting. Server time is differs from NTP more than one minute.', 'ry-woocommerce-tools'),
+            );
+        }
+    }
+
+    public function plugin_action_links($links)
+    {
+        return array_merge([
+            'settings' => '<a href="' . esc_url(admin_url('admin.php?page=wc-settings&tab=rytools')) . '">' . esc_html__('Settings', 'ry-woocommerce-tools') . '</a>',
+        ], $links);
+    }
+}
