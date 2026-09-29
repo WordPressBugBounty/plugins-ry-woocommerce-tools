@@ -1,8 +1,8 @@
 <?php return array(
     'root' => array(
         'name' => 'ry/woocommerce-tools',
-        'pretty_version' => '2026.8.10',
-        'version' => '2026.8.10.0',
+        'pretty_version' => '2026.9.29',
+        'version' => '2026.9.29.0',
         'reference' => null,
         'type' => 'library',
         'install_path' => __DIR__ . '/../../../',
@@ -11,8 +11,8 @@
     ),
     'versions' => array(
         'ry/woocommerce-tools' => array(
-            'pretty_version' => '2026.8.10',
-            'version' => '2026.8.10.0',
+            'pretty_version' => '2026.9.29',
+            'version' => '2026.9.29.0',
             'reference' => null,
             'type' => 'library',
             'install_path' => __DIR__ . '/../../../',

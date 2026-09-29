@@ -83,7 +83,7 @@ final class RY_WT_WC_ECPay_Gateway_Api extends RY_WT_ECPay_Api
         $args['CheckMacValue'] = $this->generate_hash_value($args, $api_info['HashKey'], $api_info['HashIV'], 'sha256');
         RY_WT_WC_ECPay_Gateway::instance()->log('Generating payment by ' . $gateway->id . ' for #' . $order->get_id(), WC_Log_Levels::INFO, ['data' => $args]);
 
-        $this->set_tradeno($order, $args['MerchantTradeNo']);
+        $this->set_trade_no($order, $args['MerchantTradeNo']);
         $order->save();
 
         if ($api_info['testmode']) {
@@ -103,7 +103,7 @@ final class RY_WT_WC_ECPay_Gateway_Api extends RY_WT_ECPay_Api
 
         $args = [
             'MerchantID' => $api_info['MerchantID'],
-            'MerchantTradeNo' => $this->get_tradeno($order),
+            'MerchantTradeNo' => $this->get_trade_no($order, $order->get_transaction_id()),
             'TimeStamp' => new DateTime('now', new DateTimeZone('Asia/Taipei')),
         ];
 
@@ -154,7 +154,7 @@ final class RY_WT_WC_ECPay_Gateway_Api extends RY_WT_ECPay_Api
             ],
             'Data' => wp_json_encode([
                 'MerchantID' => $api_info['MerchantID'],
-                'MerchantTradeNo' => $this->get_tradeno($order),
+                'MerchantTradeNo' => $this->get_trade_no($order, $order->get_transaction_id()),
             ]),
         ];
         $args['RqHeader']['Timestamp'] = $args['RqHeader']['Timestamp']->getTimestamp();
@@ -188,7 +188,7 @@ final class RY_WT_WC_ECPay_Gateway_Api extends RY_WT_ECPay_Api
             return;
         }
 
-        $result->Data = openssl_decrypt($result->Data, self::ENCRYPT_METHOD, $api_info['HashKey'], 0, $api_info['HashIV']);
+        $result->Data = openssl_decrypt($result->Data, 'aes-128-cbc', $api_info['HashKey'], 0, $api_info['HashIV']);
         $result->Data = json_decode(urldecode($result->Data), true);
 
         if (!is_array($result->Data)) {
@@ -207,7 +207,7 @@ final class RY_WT_WC_ECPay_Gateway_Api extends RY_WT_ECPay_Api
 
         $args = [
             'MerchantID' => $api_info['MerchantID'],
-            'MerchantTradeNo' => $this->get_tradeno($order),
+            'MerchantTradeNo' => $this->get_trade_no($order, $order->get_transaction_id()),
             'TradeNo' => $order->get_transaction_id(),
             'Action' => $action,
             'TotalAmount' => $amount,

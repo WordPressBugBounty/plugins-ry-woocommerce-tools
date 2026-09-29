@@ -4,7 +4,7 @@ defined('ABSPATH') or exit;
 
 abstract class RY_WT_PAYUNi_Api extends RY_WT_Api
 {
-    protected const ENCRYPT_METHOD = 'aes-256-gcm';
+    protected const TRADENO_META_KEY = '_payuni_MerTradeNo';
 
     protected function get_3rd_return_url($order = null)
     {
@@ -46,7 +46,7 @@ abstract class RY_WT_PAYUNi_Api extends RY_WT_Api
     protected function data_encrypt($args, $HashKey, $HashIV)
     {
         $tag = '';
-        $encrypted = @openssl_encrypt(http_build_query($args), self::ENCRYPT_METHOD, $HashKey, 0, $HashIV, $tag);
+        $encrypted = @openssl_encrypt(http_build_query($args), 'aes-256-gcm', $HashKey, 0, $HashIV, $tag);
         return trim(bin2hex($encrypted . ':::' . base64_encode($tag)));
     }
 
@@ -55,7 +55,7 @@ abstract class RY_WT_PAYUNi_Api extends RY_WT_Api
         $string = hex2bin($string);
         if (str_contains($string, ':::')) {
             list($encryptData, $tag) = explode(':::', $string, 2);
-            return openssl_decrypt($encryptData, self::ENCRYPT_METHOD, $HashKey, 0, $HashIV, base64_decode($tag));
+            return openssl_decrypt($encryptData, 'aes-256-gcm', $HashKey, 0, $HashIV, base64_decode($tag));
         }
         return false;
     }
@@ -111,25 +111,5 @@ abstract class RY_WT_PAYUNi_Api extends RY_WT_Api
             }
         }
         return false;
-    }
-
-    protected function set_tradeno($order, $tradeno = '')
-    {
-        $this->_set_tradeno($order, '_payuni_MerTradeNo', $tradeno);
-    }
-
-    protected function is_used_tradeno($order, $trade_no = '')
-    {
-        return $this->_is_used_tradeno($order, '_payuni_MerTradeNo', $trade_no);
-    }
-
-    protected function set_tradeno_transaction_id($order, $trade_no = '', $transaction_ID = '')
-    {
-        $this->_set_tradeno_transaction_id($order, '_payuni_MerTradeNo', $trade_no, $transaction_ID);
-    }
-
-    protected function get_tradeno($order)
-    {
-        return $this->_get_tradeno($order, '_payuni_MerTradeNo');
     }
 }
