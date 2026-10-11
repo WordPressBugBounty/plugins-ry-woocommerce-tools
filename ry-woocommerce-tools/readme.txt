@@ -2,10 +2,10 @@
 Contributors: fantasyworld
 Donate link: https://www.paypal.me/RicherYang
 Tags: woocommerce, payment, gateway, shipping
-Requires at least: 6.8
+Requires at least: 7.0
 Requires PHP: 8.2
 Tested up to: 7.1
-Stable tag: 2026.9.29
+Stable tag: 2026.10.9
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -25,8 +25,8 @@ You can contribute to this plugin to [GitHub repository](https://github.com/Rich
 = Minimum Requirements =
 
 * PHP 8.2+
-* WordPress 6.8+
-* WooCommerce 9.0+
+* WordPress 7.0+
+* WooCommerce 10.0+
 
 == Frequently Asked Questions ==
 Basically I didn't follow the support forum at wordpress.org.
@@ -39,6 +39,9 @@ Please visit the [plugin forum page](https://ry-plugin.com/ry-woocommerce-tools/
 3. SmilePay gateway global settings.
 
 == Changelog ==
+
+= 2026.10.9 =
+* 調整 - 物流外包裝尺寸的計算方式。
 
 = 2026.9.29 =
 * 調整 - 綠界物流的第一張物流單支援使用相同訂單編號。
