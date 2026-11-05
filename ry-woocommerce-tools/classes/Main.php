@@ -15,7 +15,7 @@ final class Main extends AbstractBasic
 
     public const MIN_WC_VERSION = '10.0.0';
 
-    public const MIN_PRO_TOOLS_VERSION = '2026.10.24';
+    public const MIN_PRO_TOOLS_VERSION = '2026.11.4';
 
     private static ?self $_instance = null;
 
@@ -109,6 +109,9 @@ final class Main extends AbstractBasic
         $asset_info = include RY_WT_PLUGIN_DIR . 'assets/ry-checkout.asset.php';
         wp_register_script('ry-checkout', RY_WT_PLUGIN_URL . 'assets/ry-checkout.js', $asset_info['dependencies'], $asset_info['version'], true);
 
+        if (is_checkout()) {
+            wp_enqueue_script('ry-checkout');
+        }
         if (is_checkout() || is_view_order_page() || is_order_received_page()) {
             $asset_info = include RY_WT_PLUGIN_DIR . 'assets/ry-payment.asset.php';
             wp_enqueue_style('ry-payment', RY_WT_PLUGIN_URL . 'assets/ry-payment.css', [], $asset_info['version']);

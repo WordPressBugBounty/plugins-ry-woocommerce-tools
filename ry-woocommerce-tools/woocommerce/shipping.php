@@ -36,7 +36,7 @@ final class RY_WT_WC_Shipping
             include_once RY_WT_PLUGIN_DIR . 'woocommerce/admin/shipping.php';
             RY_WT_WC_Admin_Shipping::instance();
         } else {
-            add_action('woocommerce_review_order_after_shipping', [$this, 'set_script'], 9);
+            add_action('woocommerce_after_checkout_form', [$this, 'set_script']);
         }
     }
 
@@ -186,7 +186,6 @@ final class RY_WT_WC_Shipping
 
     public function set_script()
     {
-        wp_enqueue_script('ry-checkout');
         if (true === WC()->cart->needs_shipping_address()) {
             $fields = WC()->checkout()->get_checkout_fields('shipping');
             if (isset($fields['shipping_phone']) && false === $fields['shipping_phone']['required']) {
