@@ -8,5 +8,5 @@ $baseDir = dirname(dirname($vendorDir));
 return array(
     'RY\\WooCommerce\\Admin\\' => array($baseDir . '/admin'),
     'RY\\WooCommerce\\' => array($baseDir . '/classes'),
-    'RY\\General\\V20261107\\' => array($baseDir . '/includes/ry-general'),
+    'RY\\General\\V20261116\\' => array($baseDir . '/includes/ry-general'),
 );

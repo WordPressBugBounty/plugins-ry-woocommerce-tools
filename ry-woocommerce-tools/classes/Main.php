@@ -4,7 +4,7 @@ namespace RY\WooCommerce;
 
 defined('ABSPATH') or exit;
 
-use RY\General\V20261107\AbstractBasic;
+use RY\General\V20261116\AbstractBasic;
 use RY\WooCommerce\Admin\Admin;
 
 final class Main extends AbstractBasic
@@ -15,7 +15,7 @@ final class Main extends AbstractBasic
 
     public const MIN_WC_VERSION = '10.0.0';
 
-    public const MIN_PRO_TOOLS_VERSION = '2026.11.4';
+    public const MIN_PRO_TOOLS_VERSION = '2026.11.16';
 
     private static ?self $_instance = null;
 

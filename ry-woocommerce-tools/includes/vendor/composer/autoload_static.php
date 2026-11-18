@@ -11,7 +11,7 @@ class ComposerStaticInite64032c2ab3e25fb5a5bdf407e2d65ee
         array (
             'RY\\WooCommerce\\Admin\\' => 21,
             'RY\\WooCommerce\\' => 15,
-            'RY\\General\\V20261107\\' => 21,
+            'RY\\General\\V20261116\\' => 21,
         ),
     );
 
@@ -24,7 +24,7 @@ class ComposerStaticInite64032c2ab3e25fb5a5bdf407e2d65ee
         array (
             0 => __DIR__ . '/../../..' . '/classes',
         ),
-        'RY\\General\\V20261107\\' =>
+        'RY\\General\\V20261116\\' =>
         array (
             0 => __DIR__ . '/../../..' . '/includes/ry-general',
         ),
@@ -32,17 +32,17 @@ class ComposerStaticInite64032c2ab3e25fb5a5bdf407e2d65ee
 
     public static $classMap = array (
         'Composer\\InstalledVersions' => __DIR__ . '/..' . '/composer/InstalledVersions.php',
-        'RY\\General\\V20261107\\AbstractAdmin' => __DIR__ . '/../../..' . '/includes/ry-general/AbstractAdmin.php',
-        'RY\\General\\V20261107\\AbstractAdminPage' => __DIR__ . '/../../..' . '/includes/ry-general/AbstractAdminPage.php',
-        'RY\\General\\V20261107\\AbstractBasic' => __DIR__ . '/../../..' . '/includes/ry-general/AbstractBasic.php',
-        'RY\\General\\V20261107\\AbstractLinkServer' => __DIR__ . '/../../..' . '/includes/ry-general/AbstractLinkServer.php',
-        'RY\\General\\V20261107\\ActionScheduler' => __DIR__ . '/../../..' . '/includes/ry-general/ActionScheduler.php',
-        'RY\\General\\V20261107\\ActionScheduler\\ListTable' => __DIR__ . '/../../..' . '/includes/ry-general/ActionScheduler/ListTable.php',
-        'RY\\General\\V20261107\\ActionScheduler\\View' => __DIR__ . '/../../..' . '/includes/ry-general/ActionScheduler/View.php',
-        'RY\\General\\V20261107\\Logs' => __DIR__ . '/../../..' . '/includes/ry-general/Logs.php',
-        'RY\\General\\V20261107\\Page\\Logs' => __DIR__ . '/../../..' . '/includes/ry-general/Page/Logs.php',
-        'RY\\General\\V20261107\\Page\\Option' => __DIR__ . '/../../..' . '/includes/ry-general/Page/Option.php',
-        'RY\\General\\V20261107\\Utils' => __DIR__ . '/../../..' . '/includes/ry-general/Utils.php',
+        'RY\\General\\V20261116\\AbstractAdmin' => __DIR__ . '/../../..' . '/includes/ry-general/AbstractAdmin.php',
+        'RY\\General\\V20261116\\AbstractAdminPage' => __DIR__ . '/../../..' . '/includes/ry-general/AbstractAdminPage.php',
+        'RY\\General\\V20261116\\AbstractBasic' => __DIR__ . '/../../..' . '/includes/ry-general/AbstractBasic.php',
+        'RY\\General\\V20261116\\AbstractLinkServer' => __DIR__ . '/../../..' . '/includes/ry-general/AbstractLinkServer.php',
+        'RY\\General\\V20261116\\ActionScheduler' => __DIR__ . '/../../..' . '/includes/ry-general/ActionScheduler.php',
+        'RY\\General\\V20261116\\ActionScheduler\\ListTable' => __DIR__ . '/../../..' . '/includes/ry-general/ActionScheduler/ListTable.php',
+        'RY\\General\\V20261116\\ActionScheduler\\View' => __DIR__ . '/../../..' . '/includes/ry-general/ActionScheduler/View.php',
+        'RY\\General\\V20261116\\Logs' => __DIR__ . '/../../..' . '/includes/ry-general/Logs.php',
+        'RY\\General\\V20261116\\Page\\Logs' => __DIR__ . '/../../..' . '/includes/ry-general/Page/Logs.php',
+        'RY\\General\\V20261116\\Page\\Option' => __DIR__ . '/../../..' . '/includes/ry-general/Page/Option.php',
+        'RY\\General\\V20261116\\Utils' => __DIR__ . '/../../..' . '/includes/ry-general/Utils.php',
         'RY\\WooCommerce\\Admin\\Admin' => __DIR__ . '/../../..' . '/admin/Admin.php',
         'RY\\WooCommerce\\Cron' => __DIR__ . '/../../..' . '/classes/Cron.php',
         'RY\\WooCommerce\\LinkServer' => __DIR__ . '/../../..' . '/classes/LinkServer.php',
