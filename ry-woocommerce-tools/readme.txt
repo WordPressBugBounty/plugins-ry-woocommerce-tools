@@ -5,7 +5,7 @@ Tags: woocommerce, payment, gateway, shipping
 Requires at least: 7.0
 Requires PHP: 8.2
 Tested up to: 7.1
-Stable tag: 2026.11.20
+Stable tag: 2026.11.24
 License: GPLv3
 License URI: https://www.gnu.org/licenses/gpl-3.0.txt
 
@@ -40,7 +40,7 @@ Please visit the [plugin forum page](https://ry-plugin.com/ry-woocommerce-tools/
 
 == Changelog ==
 
-= 2026.11.20 =
+= 2026.11.24 =
 * 新增 - 第三方主動通知的異常偵測封鎖機制。
 
 = 2026.11.16 =
